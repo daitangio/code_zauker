@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+# Suggested execution is mixing find / xargs with the parallel (P) parameters:
+# find test/fixture/ -type f | xargs -P 5  -n 10 ./bin/czindexer
+# will fire 5 czindexer each with 10 files to process...
+require 'code_zauker'
+ARGV.each do | l |
+  if Dir.exists?(l)
+    puts "Processing via find+xargs"
+    system("find #{l}  -type f | xargs -P 5  -n 10 #{$0}")
+  else
+    puts "Meganoids indexing #{l}"
+    fs=CodeZauker::FileScanner.new()
+    fs.load(l,noReload=false)
+  end
+end

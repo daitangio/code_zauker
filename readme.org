@@ -1,0 +1,10 @@
+* INSTALL
+To install Code Zauker, you must simply build and install the gem as usual
+
+* DEVELOPING
+For developing with Code Zauker you need bundler 1.0.21 or above
+
+* Release History
+  | Version | Date        | Summary                                           |
+  |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only) |
+  |         |             |                                                   |
