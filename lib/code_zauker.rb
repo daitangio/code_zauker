@@ -146,13 +146,13 @@ module CodeZauker
       return filenames
     end
 
-    # def reindex(fileList)
-    #   puts "Reindexing... #{fileList.length} files..."
-    #   fileList.each do |current_file |
-    #     self.remove([currnet_file])
-    #     self.load(current_file)
-    #   end
-    # end
+    def reindex(fileList)
+      #puts "Reindexing... #{fileList.length} files..."
+      fileList.each do |current_file |
+        self.remove([current_file])        
+        self.load(current_file,noReload=false)
+      end
+    end
 
     # Remove all the keys
     def removeAll()
@@ -171,15 +171,14 @@ module CodeZauker
       else
         fileList=filePaths
       end
-      puts "Files to remove from index...#{fileList.length}"
-      
+      # puts "Files to remove from index...#{fileList.length}"      
       fileList.each do |filename|
         fid=@redis.get "fscan:id:#{filename}"
         trigramsToExpurge=@redis.smembers "fscan:trigramsOnFile:#{fid}"
         if trigramsToExpurge.length==0
           puts "?Nothing to do on #{filename}"
         end
-        puts "#{filename} id=#{fid} Trigrams: #{trigramsToExpurge.length}"
+        puts "#{filename} id=#{fid} Trigrams: #{trigramsToExpurge.length} Expurging..."
         trigramsToExpurge.each do | ts |
           @redis.srem "trigram:#{ts}", fid
           begin

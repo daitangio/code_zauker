@@ -55,6 +55,7 @@ module Grep
   #
 
   def grep(file, pattern, pre_context=0, post_context=0, print_filename=true)
+    currentline=0
     if file.kind_of? String
       fileName=file
       file = File.new(file, "r")
@@ -80,13 +81,14 @@ module Grep
     loop do
       begin
         line = file.readline
+        currentline +=1
         cache.shift unless cache.length < pre_context
 
       # GG Patch
       # if print_filename==true
       #   cache.push("#{fileName}:#{line}")
       # else
-        cache.push(line)
+        cache.push("#{currentline}:#{line}")
       # end
 
 
@@ -99,6 +101,7 @@ module Grep
             post_context.times do
               begin
                 lines.push(file.readline) 
+                currentline +=1
               rescue IOError => e
                 break
               end
@@ -121,6 +124,7 @@ module Grep
           post_context.times do
             begin
               lines.push(file.readline) 
+              currentline +=1
             rescue Exception => e
               break
             end

@@ -2,15 +2,48 @@
 # Suggested execution is mixing find / xargs with the parallel (P) parameters:
 # find test/fixture/ -type f | xargs -P 5  -n 10 ./bin/czindexer
 # will fire 5 czindexer each with 10 files to process...
+require 'optparse'
+options={}
+optparse= OptionParser.new do  |opts|
+  opts.banner="Usage: $0 [options] [file1] [file2]..."
+  options[:verbose] = false
+
+  opts.on( '-v', '--verbose', 'Output more information' ) do
+    options[:verbose] = true
+  end 
+
+  options[:reindex]=false
+  opts.on( '-f', '--force-reindex', 'Force Reindex (default:false)') do
+    options[:reindex]=true
+  end
+
+  opts.on( '-h', '--help', 'Display this screen' ) do
+     puts opts
+     exit
+  end
+end
+
+
+optparse.parse!
 require 'code_zauker'
-# Allocated here to recycle connection
-begin
-  fs=CodeZauker::FileScanner.new()
-  processed_files=0
-  ARGV.each do | l |
-    if Dir.exists?(l)
-      puts "Processing via find+xargs"
-      system("find #{l}  -type f -print0 | xargs -0 -P 7  -n 5 #{$0}")
+
+
+def processElement(l,fs,options)
+  #Remove trailing / from l before proceeding
+ if l[-1]=="/"
+   l=l.chop
+ end
+    if Dir.exists?(l)     
+      puts "Processing Dir #{l}" if options[:verbose]
+      Dir["#{l}/*"].each do |elem|      
+       processElement(elem,fs,options)      
+      end
+      # puts "Processing via find+xargs" if options[:verbose]
+      # if options[:reindex]==false
+      #   system("find #{l}  -type f -print0 | xargs -0 -P 7  -n 5 #{$0}")
+      # else
+      #   system("find #{l}  -type f -print0 | xargs -0 -P 7  -n 5 #{$0} -f ")
+      # end
     else
       # avoid processing bad guys...
       toExclude=false
@@ -18,21 +51,36 @@ begin
         if l.end_with?(ext)
           toExclude=true
           break
-        end          
+        end
       end
-      if !toExclude && !l.include?("/.hg/") && !l.include?("/CVS/") && !l.include?("/.svn/")
-        #puts "Meganoids indexing #{l}"
-        fs.load(l,noReload=true)
-        processed_files+=1
+      if !toExclude && !l.include?("/.hg/") && !l.include?("/CVS/") && !l.include?("/.svn/") && !l.include?("/.git/")
+        #puts "Meganoids indexing #{l}"        
+        puts "Processing File #{l}" if options[:verbose]
+        if   options[:reindex] == true          
+          fs.reindex([l])
+        else
+          fs.load(l,noReload=true)
+        end
+        $PROCESSED_FILES+=1
       else
-        #puts "SKIPPED binary file: #{l}"        
+        puts "SKIPPED binary file: #{l}"   if options[:verbose]     
       end
-      if processed_files % 50 == 0
-        puts "czindexer: processed #{processed_files} by this instance"
+      if options[:verbose]
+        puts "czindexer: processed #{$PROCESSED_FILES} by this instance"
       end
-    end
-  end
+    end  
+end
 
+
+
+begin  
+  # Allocated here to recycle connection
+  fs=CodeZauker::FileScanner.new()
+  $PROCESSED_FILES=0
+  puts "Reindexing..." if options[:verbose]==true and options[:reindex]==true
+  ARGV.each do | l |
+    processElement(l,fs,options)
+  end
 ensure
   fs.disconnect
 end

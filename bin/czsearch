@@ -16,11 +16,4 @@ ARGV.each do | s |
       puts "#{f}:#{l}"
     end
   end
-  # if files.length >0
-  #   fline=files.join(" ")
-
-  #   # -H forces to print file name also with only one match
-  #   #cmd="grep -H --color -n '#{s}' #{fline}"    
-  #   #system(cmd)
-  # end
 end

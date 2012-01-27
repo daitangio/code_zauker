@@ -19,6 +19,8 @@ For a sample redis configuration see the etc/ dreictory of the project
    First "we are here" release.
 ** 0.0.2
    Code Cleanup, reindexing features, and sample redis server config
+   czsearch now do not relay on unix grep, so it is easier to use with jruby
+   czsearch/czindexer supports options
 
 * Release History
   | Version | Date        | Summary                                           |
