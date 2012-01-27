@@ -3,13 +3,36 @@
 # find test/fixture/ -type f | xargs -P 5  -n 10 ./bin/czindexer
 # will fire 5 czindexer each with 10 files to process...
 require 'code_zauker'
-ARGV.each do | l |
-  if Dir.exists?(l)
-    puts "Processing via find+xargs"
-    system("find #{l}  -type f | xargs -P 5  -n 10 #{$0}")
-  else
-    puts "Meganoids indexing #{l}"
-    fs=CodeZauker::FileScanner.new()
-    fs.load(l,noReload=false)
+# Allocated here to recycle connection
+begin
+  fs=CodeZauker::FileScanner.new()
+  processed_files=0
+  ARGV.each do | l |
+    if Dir.exists?(l)
+      puts "Processing via find+xargs"
+      system("find #{l}  -type f -print0 | xargs -0 -P 7  -n 5 #{$0}")
+    else
+      # avoid processing bad guys...
+      toExclude=false
+      CodeZauker::DEFAULT_EXCLUDED_EXTENSION.each do | ext |
+        if l.end_with?(ext)
+          toExclude=true
+          break
+        end          
+      end
+      if !toExclude && !l.include?("/.hg/") && !l.include?("/CVS/") && !l.include?("/.svn/")
+        #puts "Meganoids indexing #{l}"
+        fs.load(l,noReload=true)
+        processed_files+=1
+      else
+        #puts "SKIPPED binary file: #{l}"        
+      end
+      if processed_files % 50 == 0
+        puts "czindexer: processed #{processed_files} by this instance"
+      end
+    end
   end
+
+ensure
+  fs.disconnect
 end

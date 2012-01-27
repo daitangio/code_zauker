@@ -15,7 +15,12 @@ end
 require 'yard'
 YARD::Rake::YardocTask.new do |t|
   t.files   = ['lib/**/*.rb']   # optional
+  t.options += ['--title', "Code Zauker #{CodeZauker::VERSION} Documentation"]
   #t.options = ['--any', '--extra', '--opts'] # optional
+end
+
+desc "Code Zauker default task for generating doucmentation, running tests and packing gem"
+task :default => [ :test, :yard, :build] do
 end
 
 

@@ -1,17 +1,26 @@
 #!/usr/bin/env ruby 
 #== czsearch is a userful command to search via the Code Zauker facility
-# Send somethiing like -W0 to ruby, for a cleaner output
+# Send something like -W0 to ruby, for a cleaner output
 $VERBOSE=nil 
 require 'code_zauker'
+require 'code_zauker/grep'
+include Grep
+
 ARGV.each do | s |
-  #puts "Code Zauker Searching for #{s}"
+  #puts "Code Zauker Searching for #{s}"  
   fs=CodeZauker::FileScanner.new()
   files=fs.search(s)
-  if files.length >0
-    fline=files.join(" ")
-    # -H forces to print file name also with only one match
-    cmd="grep -H --color -n '#{s}' #{fline}"
-    #puts cmd
-    system(cmd)
+  files.each do |f|
+    lines=grep(f,s);
+    lines.each do |l |
+      puts "#{f}:#{l}"
+    end
   end
+  # if files.length >0
+  #   fline=files.join(" ")
+
+  #   # -H forces to print file name also with only one match
+  #   #cmd="grep -H --color -n '#{s}' #{fline}"    
+  #   #system(cmd)
+  # end
 end

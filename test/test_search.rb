@@ -13,7 +13,7 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     fs=CodeZauker::FileScanner.new()
     time = Benchmark.bm(7) do |x|
       x.report ("kurukku.txt") { fs.load("./test/fixture/kurukku.txt") } 
-      x.report ("BigFile") { fs.load("./test/fixture/TEST_LICENSE.txt")}
+      #x.report ("BigFile") { fs.load("./test/fixture/TEST_LICENSE.txt")}
       x.report("Search common words"){ fs.search("and"); fs.search("terms")  }
     end
     puts "Bench Result..."
@@ -47,11 +47,13 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     assert(files.include?("./test/fixture/kurukku.txt") ==true)   
   end
 
-  def test_less_then3_must_not_give_Redis_error
+  def test_less_then3_must_give_error
     fs=CodeZauker::FileScanner.new()
     fs.load("./test/fixture/kurukku.txt")    
-    files=fs.search("di")
-    assert_equal 0, files.length
+    assert_raise RuntimeError do
+      files=fs.search("di")
+    end
+    #assert_equal 0, files.length
   end
 
   def test_small4
@@ -67,6 +69,29 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     fs.load("./test/fixture/TEST_LICENSE.txt",noReload=true)
     files=fs.search("Notwithstanding")
     assert files.include?("./test/fixture/TEST_LICENSE.txt")==true
+  end
+
+  def test_remove
+    fs=CodeZauker::FileScanner.new()
+    fs.load("./test/fixture/kurukku.txt", noReload=true)  
+    fs.remove(["./test/fixture/kurukku.txt"])
+    files=fs.search("\"Be hungry, be foolish\"")    
+    assert files.length ==0, 
+    "Expected zero search results after removal from index. Found instead:#{files}"
+    #assert(files[0].include?("test/fixture/kurukku.txt")==true)
+  end
+
+  def test_removeAll
+    require 'redis/connection/hiredis'
+    require 'redis'
+    redis=Redis.new
+    fs=CodeZauker::FileScanner.new(redis)
+    fs.load("./test/fixture/kurukku.txt", noReload=true) 
+    fs.removeAll()
+    foundKeys=redis.keys "*"
+    #puts "Keys at empty db:#{foundKeys}"
+    assert foundKeys.length==1, "Expected only one key at empty db. Found instead #{foundKeys}"
+    assert foundKeys[0]=="fscan:nextId", "Expected only the fscan:nextId key at empty db. Found instead #{foundKeys}"
   end
 
 

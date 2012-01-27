@@ -1,10 +1,49 @@
-* INSTALL
-To install Code Zauker, you must simply build and install the gem as usual
+* Code Zauker: your code, indexed
+Code Zauker is a search engine for programming languages.
+Code Zauker is based from ideas taken by old Google Code Search and uses Redis as a basic platform
 
-* DEVELOPING
-For developing with Code Zauker you need bundler 1.0.21 or above
+For news and discussion: http://gioorgi.com/tag/code-zauker/
+
+
+* INSTALL
+To install Code Zauker,simply issue
+#+BEGIN_SRC sh
+  gem install code_zauker
+#+END_SRC
+You need also [[http://redis.io/][redis-2.4.6]] or better. 
+For a sample redis configuration see the etc/ dreictory of the project
+
+
+* Release Notes
+** 0.0.1
+   First "we are here" release.
+** 0.0.2
+   Code Cleanup, reindexing features, and sample redis server config
 
 * Release History
   | Version | Date        | Summary                                           |
   |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only) |
   |         |             |                                                   |
+
+* DEVELOPING
+For developing with Code Zauker you need bundler 1.0.21 or above
+
+
+
+* Future/Study
+** Google code input
+Offers regula expression search like
+ ^java/.*\.java$
+and also:
+
+Package		package:linux-2.6
+Language		lang:c++
+File Path		file:(code|[^or]g)search
+Class		class:HashMap
+Function		function:toString
+License		license:mozilla
+Case Sensitive		case:yes
+
+** Reference
+   http://www.rubyinside.com/21-ruby-tricks-902.html
+

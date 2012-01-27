@@ -1,10 +1,11 @@
 # -*- mode:ruby ; -*- -*
 require "code_zauker/version"
+require "code_zauker/constants"
 require 'redis/connection/hiredis'
 require 'redis'
 require 'set'
-# This module try to implement a simple reverse indexer 
-# based on redis
+# This module implements a simple reverse indexer 
+# based on Redis
 # The idea is ispired by http://swtch.com/~rsc/regexp/regexp4.html
 module CodeZauker
   GRAM_SIZE=3
@@ -12,19 +13,52 @@ module CodeZauker
   # Scan a file and push it inside redis...
   # then it can provide handy method to find file scontaining the trigram...
   class FileScanner
-    def initialize()
+    def initialize(redisConnection=nil)
+      if redisConnection==nil
+        @redis=Redis.new
+      else
+        @redis=redisConnection
+      end
     end
+    def disconnect()
+      @redis.quit
+    end
+
+   
+
+    def pushTrigramsSet(s, fid, filename)
+      error=false
+      if s.length > 5000
+        puts " >Pushing...#{s.length} for id #{fid}=#{filename}"
+      end
+      s.each do | trigram |
+        @redis.sadd "trigram:#{trigram}",fid
+        @redis.sadd "fscan:trigramsOnFile:#{fid}", trigram
+        # Add the case-insensitive-trigram
+        begin
+          @redis.sadd "trigram:ci:#{trigram.downcase}",fid
+        rescue ArgumentError 
+          error=true          
+        end
+      end
+      if s.length > 5000
+        puts " <Pushed #{s.length}..."
+        puts "WARN: Some invalid UTF-8  char on #{filename} Case insensitive search will be compromised" if error
+      end
+    end
+
+    private :pushTrigramsSet
+
     def load(filename, noReload=false)
-      # Define my redis id...
-      r=Redis.new
+      # Define my redis id...      
       # Already exists?...
-      fid=r.get "fscan:id:#{filename}"
+      fid=@redis.get "fscan:id:#{filename}"
       if fid==nil 
-        r.setnx "fscan:nextId",0
-        fid=r.incr "fscan:nextId"
+        @redis.setnx "fscan:nextId",0
+        fid=@redis.incr "fscan:nextId"
         # BUG: Consider storing it at the END of the processing
-        r.set "fscan:id:#{filename}", fid
-        r.set "fscan:id2filename:#{fid}",filename
+        @redis.set "fscan:id:#{filename}", fid
+        @redis.set "fscan:id2filename:#{fid}",filename
       else
         if noReload 
           puts "Already found #{filename} as id:#{fid} and NOT RELOADED"
@@ -54,12 +88,7 @@ module CodeZauker
             # push the trigram to redis (highly optimized)
             s.add(trigram)
             if s.length > adaptiveSize
-              puts " >Pushing...#{s.length}"
-              s.each do | trigram |
-                r.sadd "trigram:#{trigram}",fid
-                r.sadd "fscan:trigramsOnFile:#{fid}", trigram
-              end
-              puts " <Pushed #{s.length}..."
+              pushTrigramsSet(s,fid,filename)
               s=Set.new()             
             end
             trigramScanned += 1
@@ -69,19 +98,18 @@ module CodeZauker
       end
 
       if s.length > 0
-        s.each do | trigram |
-          r.sadd "trigram:#{trigram}",fid
-          r.sadd "fscan:trigramsOnFile:#{fid}", trigram
-        end
+        pushTrigramsSet(s,fid,filename)
+        s=nil
         #puts "Final push of #{s.length}"
       end
 
 
-      trigramsOnFile=r.scard "fscan:trigramsOnFile:#{fid}"
-      r.sadd "fscan:processedFiles", "fscan:id:#{filename}"
+      trigramsOnFile=@redis.scard "fscan:trigramsOnFile:#{fid}"
+      @redis.sadd "fscan:processedFiles", "#{filename}"
       trigramRatio=( (trigramsOnFile*1.0) / trigramScanned )* 100.0
-      puts "File processed. Unique Trigrams for #{filename}: #{trigramsOnFile} Total Scanned: #{trigramScanned} Ratio:#{trigramRatio}"
-      r.quit
+      if trigramRatio < 10 or trigramRatio >75
+        puts "#{filename}\n\tRatio:#{trigramRatio.round}%  Unique Trigrams:#{trigramsOnFile} Total Scanned: #{trigramScanned} "      
+      end
       return nil
     end
 
@@ -89,6 +117,9 @@ module CodeZauker
     # Find a list of file candidates to a search string
     # The search string is padded into trigrams
     def search(term)
+      if term.length < GRAM_SIZE
+        raise "FATAL: #{term} is shorter then the minimum size of #{GRAM_SIZE} character"
+      end
       #puts " ** Searching: #{term}"
       # split the term in a padded trigram      
       trigramInAnd=[]
@@ -104,25 +135,66 @@ module CodeZauker
       #puts "Trigam conversion /#{term}/ into #{trigramInAnd}"
       if trigramInAnd.length==0
         return []
-      end
-      r=Redis.new      
-      fileIds=    r.sinter(*trigramInAnd)
+      end      
+      fileIds=    @redis.sinter(*trigramInAnd)
       filenames=[]
       # fscan:id2filename:#{fid}....
       fileIds.each do | id |
-        filenames.push(r.get("fscan:id2filename:#{id}")) 
-      end
-      r.quit
+        filenames.push(@redis.get("fscan:id2filename:#{id}")) 
+      end      
       #puts " ** Files found:#{filenames} from ids #{fileIds}"
       return filenames
     end
-    
-    # This function accepts a very simple search query like
-    # Gio*
-    # will match Giovanni, Giovedi, Giorno...
-    # Giova*ni
-    # will match Giovanni, Giovani, Giovannini
-    def searchSimpleRegexp(termWithStar)
+
+    # def reindex(fileList)
+    #   puts "Reindexing... #{fileList.length} files..."
+    #   fileList.each do |current_file |
+    #     self.remove([currnet_file])
+    #     self.load(current_file)
+    #   end
+    # end
+
+    # Remove all the keys
+    def removeAll()
+      self.remove(nil)
     end
+
+    # Remove the files from the index, updating trigrams
+    def remove(filePaths=nil)
+      if filePaths==nil
+        fileList=[]
+        storedFiles=@redis.keys "fscan:id:*"
+        storedFiles.each do |fileKey|
+          filename=fileKey.split("fscan:id:")[1]
+          fileList.push(filename)
+        end
+      else
+        fileList=filePaths
+      end
+      puts "Files to remove from index...#{fileList.length}"
+      
+      fileList.each do |filename|
+        fid=@redis.get "fscan:id:#{filename}"
+        trigramsToExpurge=@redis.smembers "fscan:trigramsOnFile:#{fid}"
+        if trigramsToExpurge.length==0
+          puts "?Nothing to do on #{filename}"
+        end
+        puts "#{filename} id=#{fid} Trigrams: #{trigramsToExpurge.length}"
+        trigramsToExpurge.each do | ts |
+          @redis.srem "trigram:#{ts}", fid
+          begin
+            @redis.srem "trigram:ci:#{ts.downcase}",fid
+          rescue ArgumentError
+            # Ignore  "ArgumentError: invalid byte sequence in UTF-8"
+            # and proceed...
+          end
+        end
+        
+        @redis.del "fscan:id:#{filename}", "fscan:trigramsOnFile:#{fid}", "fscan:id2filename:#{fid}"
+        @redis.srem "fscan:processedFiles",  filename
+      end
+      return nil
+    end
+
   end
 end
