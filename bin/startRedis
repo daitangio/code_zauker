@@ -1,0 +1,4 @@
+#!/bin/bash
+
+set -v -x
+$REDIS_HOME/src/redis-server $(dirname $0)/../etc/redis.conf
