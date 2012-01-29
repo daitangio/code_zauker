@@ -25,27 +25,10 @@ For a sample redis configuration see the etc/ dreictory of the project
 * Release History
   | Version | Date        | Summary                                           |
   |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only) |
+  |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.    |
   |         |             |                                                   |
 
 * DEVELOPING
 For developing with Code Zauker you need bundler 1.0.21 or above
-
-
-
-* Future/Study
-** Google code input
-Offers regula expression search like
- ^java/.*\.java$
-and also:
-
-Package		package:linux-2.6
-Language		lang:c++
-File Path		file:(code|[^or]g)search
-Class		class:HashMap
-Function		function:toString
-License		license:mozilla
-Case Sensitive		case:yes
-
-** Reference
-   http://www.rubyinside.com/21-ruby-tricks-902.html
+See devel.org file
 

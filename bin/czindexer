@@ -21,6 +21,8 @@ optparse= OptionParser.new do  |opts|
      puts opts
      exit
   end
+
+  #TODO ADD REMOVE ALL option
 end
 
 
