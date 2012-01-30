@@ -94,6 +94,22 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     assert foundKeys[0]=="fscan:nextId", "Expected only the fscan:nextId key at empty db. Found instead #{foundKeys}"
   end
 
+  # 2012 Jan 30 New Case Insensitive Test cases
+  def test_case_insensitive1
+    fs=CodeZauker::FileScanner.new()
+    fs.load("./test/fixture/kurukku.txt", noReload=true)
+    flist=fs.isearch("caseinsensitive Search TEST.")
+    assert flist[0] =="./test/fixture/kurukku.txt", "Case insensitive search failed. #{flist}"
+  end
+
+  def test_case_insensitive2
+    fs=CodeZauker::FileScanner.new()
+    fs.load("./test/fixture/kurukku.txt", noReload=true)
+    flist=fs.isearch("caSeinsenSitive Search TEST.")
+    assert flist[0] =="./test/fixture/kurukku.txt", "Case insensitive search failed. #{flist}"
+    assert fs.search("caSeinsenSitive").length==0, "Case Sensitive Search failed"
+  end
+
 
 end
  

@@ -19,8 +19,11 @@ YARD::Rake::YardocTask.new do |t|
   #t.options = ['--any', '--extra', '--opts'] # optional
 end
 
-desc "Code Zauker default task for generating doucmentation, running tests and packing gem"
+desc "Code Zauker default task for generating documentation, running tests and packing gem"
 task :default => [ :test, :yard, :build] do
 end
 
 
+desc "Code Zauker Publisher"
+task :cz_publish => [ :test, :yard, :release] do
+end

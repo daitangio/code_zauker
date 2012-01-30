@@ -13,20 +13,28 @@ To install Code Zauker,simply issue
 You need also [[http://redis.io/][redis-2.4.6]] or better. 
 For a sample redis configuration see the etc/ dreictory of the project
 
+* Release History
+  | Version | Date        | Summary                                           |
+  |---------+-------------+---------------------------------------------------|
+  |   0.0.3 |             | Added Case insensitive search                     |
+  |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.    |
+  |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only) |
+  |         |             |                                                   |
 
-* Release Notes
-** 0.0.1
-   First "we are here" release.
+** Release Notes (details)
+** 0.0.3
+   Two case insensitive search
+   The donwcase-ready2go takes about
+   Finished tests in 3.888022s, 2.8292 tests/s, 3.3436 assertions/s.
+   in the best testcase
 ** 0.0.2
    Code Cleanup, reindexing features, and sample redis server config
    czsearch now do not relay on unix grep, so it is easier to use with jruby
    czsearch/czindexer supports options
+** 0.0.1
+   First "we are here" release.
 
-* Release History
-  | Version | Date        | Summary                                           |
-  |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only) |
-  |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.    |
-  |         |             |                                                   |
+
 
 * DEVELOPING
 For developing with Code Zauker you need bundler 1.0.21 or above

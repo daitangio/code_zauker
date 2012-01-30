@@ -47,7 +47,6 @@ module CodeZauker
       end
     end
 
-    private :pushTrigramsSet
 
     def load(filename, noReload=false)
       # Define my redis id...      
@@ -113,15 +112,7 @@ module CodeZauker
       return nil
     end
 
-    # = search
-    # Find a list of file candidates to a search string
-    # The search string is padded into trigrams
-    def search(term)
-      if term.length < GRAM_SIZE
-        raise "FATAL: #{term} is shorter then the minimum size of #{GRAM_SIZE} character"
-      end
-      #puts " ** Searching: #{term}"
-      # split the term in a padded trigram      
+    def split_in_trigrams(term, prefix)
       trigramInAnd=[]
       # Search=> Sea AND ear AND arc AND rch
       for j in 0...term.length
@@ -130,13 +121,12 @@ module CodeZauker
           # We are at the end...
           break
         end
-        trigramInAnd.push("trigram:#{currentTrigram}")
+        trigramInAnd.push("#{prefix}:#{currentTrigram}")
       end
-      #puts "Trigam conversion /#{term}/ into #{trigramInAnd}"
-      if trigramInAnd.length==0
-        return []
-      end      
-      fileIds=    @redis.sinter(*trigramInAnd)
+      return trigramInAnd
+    end
+
+    def map_ids_to_files(fileIds)
       filenames=[]
       # fscan:id2filename:#{fid}....
       fileIds.each do | id |
@@ -144,6 +134,41 @@ module CodeZauker
       end      
       #puts " ** Files found:#{filenames} from ids #{fileIds}"
       return filenames
+    end
+
+    
+
+
+    # = Do a case-insenitive search    
+    # using the special set of trigrams 
+    # "trigram:ci:*"
+    # all downcase
+    def isearch(term)
+      termLowercase=term.downcase()
+      trigramInAnd=self.split_in_trigrams(termLowercase,"trigram:ci")
+      if trigramInAnd.length==0
+        return []
+      end      
+      fileIds=    @redis.sinter(*trigramInAnd)
+      return self.map_ids_to_files(fileIds)      
+    end
+
+
+    # = search
+    # Find a list of file candidates to a search string
+    # The search string is padded into trigrams
+    def search(term)
+      if term.length < GRAM_SIZE
+        raise "FATAL: #{term} is shorter then the minimum size of #{GRAM_SIZE} character"
+      end
+      #puts " ** Searching: #{term}"
+      trigramInAnd=self.split_in_trigrams(term,"trigram")
+      #puts "Trigam conversion /#{term}/ into #{trigramInAnd}"
+      if trigramInAnd.length==0
+        return []
+      end      
+      fileIds=    @redis.sinter(*trigramInAnd)
+      return self.map_ids_to_files(fileIds)
     end
 
     def reindex(fileList)
@@ -183,17 +208,24 @@ module CodeZauker
           @redis.srem "trigram:#{ts}", fid
           begin
             @redis.srem "trigram:ci:#{ts.downcase}",fid
+            #putc "."
           rescue ArgumentError
             # Ignore  "ArgumentError: invalid byte sequence in UTF-8"
             # and proceed...
           end
         end
+        #putc "\n"
         
         @redis.del "fscan:id:#{filename}", "fscan:trigramsOnFile:#{fid}", "fscan:id2filename:#{fid}"
         @redis.srem "fscan:processedFiles",  filename
       end
       return nil
     end
+
+    private :pushTrigramsSet
+    #private :split_in_trigrams
+    #private :map_ids_to_files
+
 
   end
 end
