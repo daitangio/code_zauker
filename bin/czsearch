@@ -6,12 +6,62 @@ require 'code_zauker'
 require 'code_zauker/grep'
 include Grep
 
+require 'optparse'
+options={}
+optparse= OptionParser.new do  |opts|
+  opts.banner="Usage: czsearch [options] [term1] [term2]..."
+  options[:ignorecase]=false
+  options[:precontext]=0
+  options[:postcontext]=0
+
+  opts.on('-i', '--ignore-case','ignore case distinctions') do 
+      options[:ignorecase]=true    
+  end
+
+  opts.on('-B', '--before-context NUM', Integer, 'print NUM lines of leading context') do | c |
+    options[:precontext]=c
+  end
+
+  opts.on('-A','--after-context NUM',Integer,'print NUM lines of trailing context') do | c |
+    options[:postcontext]=c
+  end
+  opts.on('-C','--context NUM',Integer,'print NUM lines of output context') do | c |
+    if c>0 
+      options[:postcontext]=c
+      options[:precontext]=options[:postcontext]
+    end
+  end
+
+
+
+
+
+
+  opts.on( '-h', '--help', 'Display this screen' ) do
+    puts opts
+    puts "Options are grep-like"
+    puts "EXAMPLES:"
+    puts "czsearch ciao Koros"
+    puts " Will search Koros OR ciao"
+    puts "czsearch -i gnu"
+    puts " Will match also GNU and Gnu"    
+    exit
+  end
+end
+optparse.parse!
+
 ARGV.each do | s |
   #puts "Code Zauker Searching for #{s}"  
   fs=CodeZauker::FileScanner.new()
-  files=fs.search(s)
+  if options[:ignorecase]==false
+    files=fs.search(s)
+    pattern=/#{Regexp.escape(s)}/
+  else
+    files=fs.isearch(s)
+    pattern=/#{Regexp.escape(s)}/i
+  end
   files.each do |f|
-    lines=grep(f,s);
+    lines=grep(f,pattern, pre_context=options[:precontext], post_context=options[:postcontext]);
     lines.each do |l |
       puts "#{f}:#{l}"
     end

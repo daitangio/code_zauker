@@ -1,10 +1,15 @@
 module CodeZauker
   DEFAULT_EXCLUDED_EXTENSION=[
+                              # Documents
                               ".pdf",
                               ".xps",
                               ".zip",
                               ".ppt",".xls",".rtf",".vsd",  
                               ".dll",".exe",".out",".elf",".lib",".so",
+                              # Redis db
+                              ".rdb",
+                              # Ruby and java stuff-like
+                              ".gem",
                               ".jar",".class",
                               ".tar",
                               ".gz",

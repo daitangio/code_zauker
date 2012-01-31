@@ -84,15 +84,7 @@ module Grep
         currentline +=1
         cache.shift unless cache.length < pre_context
 
-      # GG Patch
-      # if print_filename==true
-      #   cache.push("#{fileName}:#{line}")
-      # else
         cache.push("#{currentline}:#{line}")
-      # end
-
-
-
         
         if line =~ pattern
           lines += cache
@@ -100,7 +92,8 @@ module Grep
           if post_context > 0
             post_context.times do
               begin
-                lines.push(file.readline) 
+                #lines.push(file.readline) 
+                lines.push("#{currentline}:#{file.readline}")                
                 currentline +=1
               rescue IOError => e
                 break
@@ -123,7 +116,8 @@ module Grep
         if post_context > 0
           post_context.times do
             begin
-              lines.push(file.readline) 
+              #lines.push(file.readline) 
+              lines.push("#{currentline}:#{file.readline}")
               currentline +=1
             rescue Exception => e
               break

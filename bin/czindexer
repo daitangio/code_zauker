@@ -5,7 +5,7 @@
 require 'optparse'
 options={}
 optparse= OptionParser.new do  |opts|
-  opts.banner="Usage: $0 [options] [file1] [file2]..."
+  opts.banner="Usage: czindexer [options] [file1] [file2]..."
   options[:verbose] = false
 
   opts.on( '-v', '--verbose', 'Output more information' ) do

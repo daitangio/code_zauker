@@ -10,6 +10,44 @@ require 'set'
 module CodeZauker
   GRAM_SIZE=3
   SPACE_GUY=" "*GRAM_SIZE
+
+  # = Basic utility class
+  class Util
+    # Compute all the possible case-mixed trigrams
+    # It works for every string size
+    # TODO: Very bad implementation, need improvements
+    def mixCase(trigram) 
+      caseMixedElements=[]
+      lx=trigram.length
+      combos=2**lx
+      startString=trigram.downcase
+      #puts "Combos... 1..#{combos}... #{startString}"
+      for c in 0..(combos-1) do
+        # Make binary
+        maskForStuff=c.to_s(2)
+        p=0
+        #puts maskForStuff
+        currentMix=""
+        # Pad it
+        if maskForStuff.length < lx
+          maskForStuff = ("0"*(lx-maskForStuff.length)) +maskForStuff
+        end        
+        maskForStuff.each_char { | x |          
+          #putc x
+          if x=="1"
+            currentMix +=startString[p].upcase
+          else
+            currentMix +=startString[p].downcase
+          end
+          #puts currentMix
+          p+=1
+        }        
+        caseMixedElements.push(currentMix)
+      end
+      return caseMixedElements
+    end
+  end
+
   # Scan a file and push it inside redis...
   # then it can provide handy method to find file scontaining the trigram...
   class FileScanner
@@ -106,14 +144,14 @@ module CodeZauker
       trigramsOnFile=@redis.scard "fscan:trigramsOnFile:#{fid}"
       @redis.sadd "fscan:processedFiles", "#{filename}"
       trigramRatio=( (trigramsOnFile*1.0) / trigramScanned )* 100.0
-      if trigramRatio < 10 or trigramRatio >75
-        puts "#{filename}\n\tRatio:#{trigramRatio.round}%  Unique Trigrams:#{trigramsOnFile} Total Scanned: #{trigramScanned} "      
+      if trigramRatio < 10 or trigramRatio >75        
+        puts "#{filename}\n\tRatio:#{trigramRatio.round}%  Unique Trigrams:#{trigramsOnFile} Total Scanned: #{trigramScanned} ?Binary" if trigramRatio >80 and trigramsOnFile>150
       end
       return nil
     end
 
     def split_in_trigrams(term, prefix)
-      trigramInAnd=[]
+      trigramInAnd=Set.new()
       # Search=> Sea AND ear AND arc AND rch
       for j in 0...term.length
         currentTrigram=term[j,GRAM_SIZE]        
@@ -121,7 +159,7 @@ module CodeZauker
           # We are at the end...
           break
         end
-        trigramInAnd.push("#{prefix}:#{currentTrigram}")
+        trigramInAnd.add("#{prefix}:#{currentTrigram}")
       end
       return trigramInAnd
     end
@@ -145,12 +183,12 @@ module CodeZauker
     # all downcase
     def isearch(term)
       termLowercase=term.downcase()
-      trigramInAnd=self.split_in_trigrams(termLowercase,"trigram:ci")
+      trigramInAnd=split_in_trigrams(termLowercase,"trigram:ci")
       if trigramInAnd.length==0
         return []
       end      
       fileIds=    @redis.sinter(*trigramInAnd)
-      return self.map_ids_to_files(fileIds)      
+      return map_ids_to_files(fileIds)      
     end
 
 
@@ -162,13 +200,13 @@ module CodeZauker
         raise "FATAL: #{term} is shorter then the minimum size of #{GRAM_SIZE} character"
       end
       #puts " ** Searching: #{term}"
-      trigramInAnd=self.split_in_trigrams(term,"trigram")
+      trigramInAnd=split_in_trigrams(term,"trigram")
       #puts "Trigam conversion /#{term}/ into #{trigramInAnd}"
       if trigramInAnd.length==0
         return []
       end      
       fileIds=    @redis.sinter(*trigramInAnd)
-      return self.map_ids_to_files(fileIds)
+      return map_ids_to_files(fileIds)
     end
 
     def reindex(fileList)
@@ -181,7 +219,14 @@ module CodeZauker
 
     # Remove all the keys
     def removeAll()
-      self.remove(nil)
+      tokill=[]
+      tokill=@redis.keys("fscan:*")
+      tokill.push(*(@redis.keys("trigram*")))      
+      tokill.each do | x |
+        @redis.del x
+        #puts "Deleted #x"
+      end
+      @redis.del "fscan:processedFiles"
     end
 
     # Remove the files from the index, updating trigrams
@@ -203,7 +248,7 @@ module CodeZauker
         if trigramsToExpurge.length==0
           puts "?Nothing to do on #{filename}"
         end
-        puts "#{filename} id=#{fid} Trigrams: #{trigramsToExpurge.length} Expurging..."
+        puts "#{filename} id=#{fid} Trigrams: #{trigramsToExpurge.length} Expurging..."        
         trigramsToExpurge.each do | ts |
           @redis.srem "trigram:#{ts}", fid
           begin
@@ -216,15 +261,15 @@ module CodeZauker
         end
         #putc "\n"
         
-        @redis.del "fscan:id:#{filename}", "fscan:trigramsOnFile:#{fid}", "fscan:id2filename:#{fid}"
+        @redis.del  "fscan:id:#{filename}", "fscan:trigramsOnFile:#{fid}", "fscan:id2filename:#{fid}"
         @redis.srem "fscan:processedFiles",  filename
       end
       return nil
     end
 
     private :pushTrigramsSet
-    #private :split_in_trigrams
-    #private :map_ids_to_files
+    private :split_in_trigrams
+    private :map_ids_to_files
 
 
   end

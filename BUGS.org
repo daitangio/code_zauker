@@ -1,0 +1,4 @@
+
+* Bug 001 :wontfix_soon:
+  Indexing a 700Kb gem take too much time, it seems looping
+  Avoid indexing gem file for the meantime.

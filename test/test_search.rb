@@ -67,7 +67,7 @@ class FileScannerBasicSearch < Test::Unit::TestCase
   def test_very_big_file
     fs=CodeZauker::FileScanner.new()
     fs.load("./test/fixture/TEST_LICENSE.txt",noReload=true)
-    files=fs.search("Notwithstanding")
+    files=fs.search('"Commercial Use"')
     assert files.include?("./test/fixture/TEST_LICENSE.txt")==true
   end
 
@@ -90,11 +90,10 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     fs.removeAll()
     foundKeys=redis.keys "*"
     #puts "Keys at empty db:#{foundKeys}"
-    assert foundKeys.length==1, "Expected only one key at empty db. Found instead #{foundKeys}"
-    assert foundKeys[0]=="fscan:nextId", "Expected only the fscan:nextId key at empty db. Found instead #{foundKeys}"
+    assert foundKeys.length==0, "Expected empty db. Found instead #{foundKeys}"
   end
 
-  # 2012 Jan 30 New Case Insensitive Test cases
+  # # 2012 Jan 30 New Case Insensitive Test cases
   def test_case_insensitive1
     fs=CodeZauker::FileScanner.new()
     fs.load("./test/fixture/kurukku.txt", noReload=true)
@@ -108,6 +107,39 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     flist=fs.isearch("caSeinsenSitive Search TEST.")
     assert flist[0] =="./test/fixture/kurukku.txt", "Case insensitive search failed. #{flist}"
     assert fs.search("caSeinsenSitive").length==0, "Case Sensitive Search failed"
+  end
+
+  def test_case_insensitive3
+    fs=CodeZauker::FileScanner.new()
+    fs.load("./test/fixture/kurukku.txt", noReload=true)
+    u=CodeZauker::Util.new()
+    (u.mixCase("CaSeinsen")).each { |t|
+      #puts "Checking #{t}"
+      flist=fs.isearch(t)
+      assert flist[0] == "./test/fixture/kurukku.txt", "Case insensitive search failed for input: #{t}. Got: #{flist} instead of kirukku.txt"
+    }    
+  end
+
+  ### Here follows Generic utils test...
+
+  def test_case_mixer1
+    u=CodeZauker::Util.new()
+    t1=u.mixCase("a")
+    puts "test_case_mixer  #{t1}"
+    assert t1[0]=="a"
+    assert t1[1]=="A"
+    w2=u.mixCase("ab")
+    puts "#{w2}"
+    assert "#{w2}" == '["ab", "aB", "Ab", "AB"]', "Failed expected permutation."
+    w3=u.mixCase("abc")
+    puts "#{w3}"
+    assert "#{w3}" == '["abc", "abC", "aBc", "aBC", "Abc", "AbC", "ABc", "ABC"]', "Failed expected permutation. Got:#{w3}"
+  end
+
+  def test_case_mixer1
+    u=CodeZauker::Util.new()
+    t1=u.mixCase("abcd")
+    assert t1.length==16, "Expected permutation is not of the correct size (16). Got:#{t1}"
   end
 
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 ; mode: ruby; -*-
+# rvm use default will save your days
 require "bundler/gem_tasks"
 
 # See http://jasonseifer.com/2010/04/06/rake-tutorial
@@ -20,10 +21,12 @@ YARD::Rake::YardocTask.new do |t|
 end
 
 desc "Code Zauker default task for generating documentation, running tests and packing gem"
-task :default => [ :test, :yard, :build] do
+task :default => [ :test, :yard] do
+  puts "Use cz_publish to release your work, Meganiod!"
+  puts "                                     Koros"
 end
 
 
 desc "Code Zauker Publisher"
-task :cz_publish => [ :test, :yard, :release] do
+task :cz_publish => [ :test, :yard, :build, :release] do
 end

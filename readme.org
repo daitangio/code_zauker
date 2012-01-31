@@ -23,10 +23,7 @@ For a sample redis configuration see the etc/ dreictory of the project
 
 ** Release Notes (details)
 ** 0.0.3
-   Two case insensitive search
-   The donwcase-ready2go takes about
-   Finished tests in 3.888022s, 2.8292 tests/s, 3.3436 assertions/s.
-   in the best testcase
+   Fully implemented case insensitive search
 ** 0.0.2
    Code Cleanup, reindexing features, and sample redis server config
    czsearch now do not relay on unix grep, so it is easier to use with jruby
