@@ -40,6 +40,7 @@
 #
 #++
 
+require 'code_zauker'
 module Grep
 
   #
@@ -78,9 +79,12 @@ module Grep
     cache = []
     lines = []
 
+    util=CodeZauker::Util.new()
+
     loop do
       begin
-        line = file.readline
+        line = util.ensureUTF8(file.readline)
+        
         currentline +=1
         cache.shift unless cache.length < pre_context
 
@@ -91,9 +95,9 @@ module Grep
           cache = []
           if post_context > 0
             post_context.times do
-              begin
-                #lines.push(file.readline) 
-                lines.push("#{currentline}:#{file.readline}")                
+              begin                
+                utf8line=util.ensureUTF8(file.readline)
+                lines.push("#{currentline}:#{utf8line}")                
                 currentline +=1
               rescue IOError => e
                 break
@@ -103,12 +107,18 @@ module Grep
         end
       rescue IOError => e
         break
+      rescue ArgumentError =>e2
+        # Rethrow a probably UTF-8 fatal error
+        puts "Pattern Matching failed on \n\t#{fileName}\n\tLine:#{line}"
+        puts "Encoding of line:#{line.encoding.name} Valid? #{line.valid_encoding?}"
+        #raise e2
       end
     end
     
 
-    file.each_line do |line|
+    file.each_line do |untrustedLine|
       cache.shift unless cache.length < pre_context
+      line=util.ensureUTF8(untrustedLine)
       cache.push(line)
 
       if line =~ pattern
@@ -116,8 +126,8 @@ module Grep
         if post_context > 0
           post_context.times do
             begin
-              #lines.push(file.readline) 
-              lines.push("#{currentline}:#{file.readline}")
+              utf8line=util.ensureUTF8(file.readline)
+              lines.push("#{currentline}:#{utf8line}")  
               currentline +=1
             rescue Exception => e
               break

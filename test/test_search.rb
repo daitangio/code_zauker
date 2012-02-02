@@ -81,17 +81,17 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     #assert(files[0].include?("test/fixture/kurukku.txt")==true)
   end
 
-  def test_removeAll
-    require 'redis/connection/hiredis'
-    require 'redis'
-    redis=Redis.new
-    fs=CodeZauker::FileScanner.new(redis)
-    fs.load("./test/fixture/kurukku.txt", noReload=true) 
-    fs.removeAll()
-    foundKeys=redis.keys "*"
-    #puts "Keys at empty db:#{foundKeys}"
-    assert foundKeys.length==0, "Expected empty db. Found instead #{foundKeys}"
-  end
+  # def test_removeAll
+  #   require 'redis/connection/hiredis'
+  #   require 'redis'
+  #   redis=Redis.new
+  #   fs=CodeZauker::FileScanner.new(redis)
+  #   fs.load("./test/fixture/kurukku.txt", noReload=true) 
+  #   fs.removeAll()
+  #   foundKeys=redis.keys "*"
+  #   #puts "Keys at empty db:#{foundKeys}"
+  #   assert foundKeys.length==0, "Expected empty db. Found instead #{foundKeys}"
+  # end
 
   # # 2012 Jan 30 New Case Insensitive Test cases
   def test_case_insensitive1
@@ -116,7 +116,8 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     (u.mixCase("CaSeinsen")).each { |t|
       #puts "Checking #{t}"
       flist=fs.isearch(t)
-      assert flist[0] == "./test/fixture/kurukku.txt", "Case insensitive search failed for input: #{t}. Got: #{flist} instead of kirukku.txt"
+
+      assert  flist.include?("./test/fixture/kurukku.txt"), "Case insensitive search failed for input: #{t}. #{flist}  do not ocntain kurukku.txt"
     }    
   end
 
@@ -142,6 +143,32 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     assert t1.length==16, "Expected permutation is not of the correct size (16). Got:#{t1}"
   end
 
+
+  def test_zip
+    require 'zip/zip'
+    require 'pp'
+    # /d/ISP/REPS0/extra-sources/repsSRC201201.zip
+    zf=Zip::ZipFile.new("test/fixture/testArchive.zip")
+    pp(zf)
+    zf.each_with_index {
+      |entry, index|
+      # entry.get_input_stream() get a  fancy Zip::ZipInputStream
+      print "#{index} -- #{entry.name} (#{entry.size} bytes):  "
+      pp(entry)
+      puts "------"
+      # puts "'#{zis.gets.chomp}'"
+      # entry = zis.get_next_entry
+      # print "First line of '#{entry.name} (#{entry.size} bytes):  "
+      # puts "'#{zis.gets.chomp}'"
+    }
+  end
+
+  # BUG Sometimes a trailing nil is returned in the list
+  # We try to push a non-existent id and get back an error
+  def test_map_ids_to_file()
+    fs=CodeZauker::FileScanner.new()
+    assert_equal [],fs.map_ids_to_files([1234455677461])
+  end
 
 end
  

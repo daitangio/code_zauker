@@ -46,6 +46,32 @@ module CodeZauker
       end
       return caseMixedElements
     end
+
+    # = Ensure Data are correctly imported
+    # http://blog.grayproductions.net/articles/ruby_19s_string
+    # This code try to "guess" the right encoding
+    # switching to ISO-8859-1 if UTF-8 is not valid.
+    # Tipical use case: an italian source code wronlgy interpreted as a UTF-8 
+    # whereas it is a ISO-8859 windows code.
+    def ensureUTF8(untrusted_string)
+      if untrusted_string.valid_encoding?()==false 
+        #puts "DEBUG Trouble on #{untrusted_string}"
+        untrusted_string.force_encoding("ISO-8859-1")        
+        # We try ISO-8859-1 tipical windows 
+        begin
+          valid_string=untrusted_string.encode("UTF-8", { :undef =>:replace, :invalid => :replace} )           
+        rescue Encoding::InvalidByteSequenceError => e   
+          raise e
+        end
+        # if valid_string != untrusted_string
+        #   puts "CONVERTED #{valid_string} Works?#{valid_string.valid_encoding?}"
+        # end
+        return valid_string
+      else
+        return untrusted_string
+      end
+    end
+
   end
 
   # Scan a file and push it inside redis...
@@ -58,32 +84,65 @@ module CodeZauker
         @redis=redisConnection
       end
     end
-    def disconnect()
+
+    
+    def disconnect()    
       @redis.quit
     end
 
+
    
 
+
     def pushTrigramsSet(s, fid, filename)
-      error=false
-      if s.length > 5000
+      case_insensitive_trigram_failed=false
+      showlog=false
+      if s.length > (TRIGRAM_DEFAULT_PUSH_SIZE/2)
         puts " >Pushing...#{s.length} for id #{fid}=#{filename}"
+        showlog=true
       end
-      s.each do | trigram |
-        @redis.sadd "trigram:#{trigram}",fid
-        @redis.sadd "fscan:trigramsOnFile:#{fid}", trigram
-        # Add the case-insensitive-trigram
+      # Ask for a protected transaction
+      # Sometimes can fail...
+      welldone=false
+      tryCounter=0
+      while welldone == false do
         begin
-          @redis.sadd "trigram:ci:#{trigram.downcase}",fid
-        rescue ArgumentError 
-          error=true          
+          tryCounter +=1
+          case_insensitive_trigram_failed=pushTrigramsSetRecoverable(s,fid,filename)          
+          welldone=true
+        rescue Errno::EAGAIN =>ea
+          if tryCounter >=MAX_PUSH_TRIGRAM_RETRIES
+            puts "FATAL: Too many Errno::EAGAIN Errors"
+            raise ea
+          else
+            puts "Trouble storing #{s.length} data. Retrying..." 
+            welldone=false
+          end
         end
       end
-      if s.length > 5000
+      if showlog
         puts " <Pushed #{s.length}..."
-        puts "WARN: Some invalid UTF-8  char on #{filename} Case insensitive search will be compromised" if error
-      end
+      end      
+      puts "WARN: Some invalid UTF-8  char on #{filename} Case insensitive search will be compromised" if case_insensitive_trigram_failed      
     end
+
+    def pushTrigramsSetRecoverable(s, fid, filename)
+      error=false
+      @redis.multi do
+        s.each do | trigram |        
+          @redis.sadd "trigram:#{trigram}",fid
+          @redis.sadd "fscan:trigramsOnFile:#{fid}", trigram
+          # Add the case-insensitive-trigram
+          begin
+            @redis.sadd "trigram:ci:#{trigram.downcase}",fid
+          rescue ArgumentError 
+            error=true          
+          end
+        end
+      end # multi
+      return error
+    end
+    private :pushTrigramsSetRecoverable
 
 
     def load(filename, noReload=false)
@@ -98,7 +157,7 @@ module CodeZauker
         @redis.set "fscan:id2filename:#{fid}",filename
       else
         if noReload 
-          puts "Already found #{filename} as id:#{fid} and NOT RELOADED"
+          #puts "Already found #{filename} as id:#{fid} and NOT RELOADED"
           return nil
         end
       end      
@@ -110,10 +169,12 @@ module CodeZauker
       # before sending it to redis. This avoid
       # a lot of spourios work      
       s=Set.new
-      File.open(filename,"r") do |f|
+      File.open(filename,"r") { |f|
         lines=f.readlines()        
-        adaptiveSize= 6000
-        lines.each do  |l|
+        adaptiveSize= TRIGRAM_DEFAULT_PUSH_SIZE
+        util=Util.new()
+        lines.each do  |lineNotUTF8|
+          l= util.ensureUTF8(lineNotUTF8)
           # Split each line into 3-char chunks, and store in a redis set
           i=0
           for istart in 0...(l.length-GRAM_SIZE) 
@@ -132,7 +193,7 @@ module CodeZauker
             #puts "#{istart} Trigram fscan:#{trigram}/  FileId: #{fid}"
           end
         end
-      end
+      }
 
       if s.length > 0
         pushTrigramsSet(s,fid,filename)
@@ -145,7 +206,7 @@ module CodeZauker
       @redis.sadd "fscan:processedFiles", "#{filename}"
       trigramRatio=( (trigramsOnFile*1.0) / trigramScanned )* 100.0
       if trigramRatio < 10 or trigramRatio >75        
-        puts "#{filename}\n\tRatio:#{trigramRatio.round}%  Unique Trigrams:#{trigramsOnFile} Total Scanned: #{trigramScanned} ?Binary" if trigramRatio >80 and trigramsOnFile>150
+        puts "#{filename}\n\tRatio:#{trigramRatio.round}%  Unique Trigrams:#{trigramsOnFile} Total Scanned: #{trigramScanned} ?Binary" if trigramRatio >90 and trigramsOnFile>70
       end
       return nil
     end
@@ -168,7 +229,8 @@ module CodeZauker
       filenames=[]
       # fscan:id2filename:#{fid}....
       fileIds.each do | id |
-        filenames.push(@redis.get("fscan:id2filename:#{id}")) 
+        file_name=@redis.get("fscan:id2filename:#{id}")
+        filenames.push(file_name)  if !file_name.nil?
       end      
       #puts " ** Files found:#{filenames} from ids #{fileIds}"
       return filenames
@@ -194,7 +256,7 @@ module CodeZauker
 
     # = search
     # Find a list of file candidates to a search string
-    # The search string is padded into trigrams
+    # The search string is padded into trigrams    
     def search(term)
       if term.length < GRAM_SIZE
         raise "FATAL: #{term} is shorter then the minimum size of #{GRAM_SIZE} character"
@@ -206,7 +268,9 @@ module CodeZauker
         return []
       end      
       fileIds=    @redis.sinter(*trigramInAnd)
-      return map_ids_to_files(fileIds)
+      fileNames=map_ids_to_files(fileIds)
+      #puts "DEBUG #{fileIds} #{fileNames}"
+      return fileNames
     end
 
     def reindex(fileList)
@@ -269,7 +333,7 @@ module CodeZauker
 
     private :pushTrigramsSet
     private :split_in_trigrams
-    private :map_ids_to_files
+    #private :map_ids_to_files
 
 
   end
