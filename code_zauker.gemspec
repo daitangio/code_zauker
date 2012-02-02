@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency "hiredis", "~> 0.3"
   s.add_runtime_dependency "redis", "~> 2.2"
+  s.add_runtime_dependency "rubyzip", "~> 0.9"
 
   ## Install and require the hiredis gem before redis-rb for maximum performances.
   #s.add_runtime_dependency "redis", "~> 2.2", :require => ["redis/connection/hiredis", "redis"]

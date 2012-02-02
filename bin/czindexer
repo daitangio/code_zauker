@@ -18,8 +18,8 @@ optparse= OptionParser.new do  |opts|
   end
 
   opts.on( '-h', '--help', 'Display this screen' ) do
-     puts opts
-     exit
+    puts opts
+    exit
   end
 
   #TODO ADD REMOVE ALL option
@@ -30,59 +30,66 @@ optparse.parse!
 require 'code_zauker'
 
 
-def processElement(l,fs,options)
+def processElement(l,fs,options)  
   #Remove trailing / from l before proceeding
- if l[-1]=="/"
-   l=l.chop
- end
-    if Dir.exists?(l)     
-      puts "Processing Dir #{l}" if options[:verbose]
-      Dir["#{l}/*"].each do |elem|      
-       processElement(elem,fs,options)      
+  if l[-1]=="/"
+    l=l.chop
+  end
+  if Dir.exists?(l)     
+    #puts "Processing Dir #{l}" if options[:verbose]
+    Dir["#{l}/*"].each do |elem|      
+      processElement(elem,fs,options)      
+    end
+    # puts "Processing via find+xargs" if options[:verbose]
+    # if options[:reindex]==false
+    #   system("find #{l}  -type f -print0 | xargs -0 -P 7  -n 5 #{$0}")
+    # else
+    #   system("find #{l}  -type f -print0 | xargs -0 -P 7  -n 5 #{$0} -f ")
+    # end
+  else
+    # avoid processing bad guys...
+    toExclude=false
+    CodeZauker::DEFAULT_EXCLUDED_EXTENSION.each do | ext |
+      if l.downcase().end_with?(ext)
+        toExclude=true
+        break
       end
-      # puts "Processing via find+xargs" if options[:verbose]
-      # if options[:reindex]==false
-      #   system("find #{l}  -type f -print0 | xargs -0 -P 7  -n 5 #{$0}")
-      # else
-      #   system("find #{l}  -type f -print0 | xargs -0 -P 7  -n 5 #{$0} -f ")
-      # end
-    else
-      # avoid processing bad guys...
-      toExclude=false
-      CodeZauker::DEFAULT_EXCLUDED_EXTENSION.each do | ext |
-        if l.end_with?(ext)
-          toExclude=true
-          break
-        end
-      end
-      if !toExclude && !l.include?("/.hg/") && !l.include?("/CVS/") && !l.include?("/.svn/") && !l.include?("/.git/")
-        #puts "Meganoids indexing #{l}"        
-        puts "Processing File #{l}" if options[:verbose]
-        if   options[:reindex] == true          
-          fs.reindex([l])
-        else
-          fs.load(l,noReload=true)
-        end
-        $PROCESSED_FILES+=1
+    end
+    if !toExclude && !l.include?("/.hg/") && !l.include?("/CVS/") && !l.include?("/.svn/") && !l.include?("/.git/")
+      #puts "Processing File #{l}" if options[:verbose]
+      startTime=Time.now
+      if   options[:reindex] == true          
+        fs.reindex([l])
       else
-        puts "SKIPPED binary file: #{l}"   if options[:verbose]     
+        fs.load(l,noReload=true)
       end
-      if options[:verbose]
-        puts "czindexer: processed #{$PROCESSED_FILES} by this instance"
+      timeTaken=Time.now-startTime
+      $PROCESSED_FILES+=1
+      $CUMULATED_TIME +=timeTaken
+      $FILES_PER_SEC= $PROCESSED_FILES/$CUMULATED_TIME
+      if options[:verbose] and (( $PROCESSED_FILES % 75 ) == 0 )
+        puts "#{$PROCESSED_FILES} files processed so far... Files per sec:#{$FILES_PER_SEC} Last:#{timeTaken}"
       end
-    end  
+    else
+      #puts "SKIPPED binary file: #{l}"   if options[:verbose]     
+    end
+
+  end  
 end
 
 
 
 begin  
+  $CUMULATED_TIME=0
   # Allocated here to recycle connection
   fs=CodeZauker::FileScanner.new()
   $PROCESSED_FILES=0
+  puts "Code Zauker v#{CodeZauker::VERSION}" if  options[:verbose]
   puts "Reindexing..." if options[:verbose]==true and options[:reindex]==true
   ARGV.each do | l |
     processElement(l,fs,options)
   end
 ensure
   fs.disconnect
+  puts "End:#{$PROCESSED_FILES} files Files per sec:#{$FILES_PER_SEC}"
 end
