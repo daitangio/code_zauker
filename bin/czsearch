@@ -13,6 +13,8 @@ optparse= OptionParser.new do  |opts|
   options[:ignorecase]=false
   options[:precontext]=0
   options[:postcontext]=0
+  options[:extensions_to_ignore]=[]
+  options[:file_to_exclude]=[]
 
   opts.on('-i', '--ignore-case','ignore case distinctions') do 
       options[:ignorecase]=true    
@@ -32,7 +34,12 @@ optparse= OptionParser.new do  |opts|
     end
   end
 
-
+  
+  
+  opts.on('-X','--exclude FILE_PATTERN',String,
+          'Exclude files that match FILE_PATTERN (as ruby regexp). Case insensitive') do |p|
+    options[:file_to_exclude].push(/#{Regexp.escape(p)}/i);
+  end
 
 
 
@@ -44,7 +51,9 @@ optparse= OptionParser.new do  |opts|
     puts "czsearch ciao Koros"
     puts " Will search Koros OR ciao"
     puts "czsearch -i gnu"
-    puts " Will match also GNU and Gnu"    
+    puts " Will match also GNU and Gnu"   
+    puts "czsearch  -X .orig -X .bak -X .java  html:select"
+    puts " Will skip java and backup file"
     exit
   end
 end
@@ -61,9 +70,31 @@ ARGV.each do | s |
     pattern=/#{Regexp.escape(s)}/i
   end
   files.each do |f|
-    lines=grep(f,pattern, pre_context=options[:precontext], post_context=options[:postcontext]);
-    lines.each do |l |
-      puts "#{f}:#{l}"
+    to_exclude=false
+    if options[:file_to_exclude].length >0
+      # Will match?
+      to_exclude=false
+      options[:file_to_exclude].each do |pattern|
+        #puts "\n\t#{f} =~  #{pattern}"
+        if (f  =~ pattern )
+          to_exclude=true
+          #puts "Excluded #{f}"
+          break
+        end
+      end
+    end
+    if !to_exclude
+      begin
+        lines=grep(f,pattern, pre_context=options[:precontext], post_context=options[:postcontext]);
+        lines.each do |l |
+          puts "#{f}:#{l}"
+        end
+      rescue ArgumentError => ioe
+        puts "FATAL ArgumentError on #{f}"
+        raise ioe
+      end
+    else
+      
     end
   end
 end
