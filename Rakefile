@@ -23,7 +23,7 @@ end
 desc "Code Zauker default task for generating documentation, running tests and packing gem"
 task :default => [ :test, :yard] do
   puts "Generating git Changelog..."
-  system('git log --pretty="|%ad|%s|" --date=short >CHANGELOG.org')
+  #system('git log --pretty="|%ad|%s|" --date=short >CHANGELOG.org')
   system('git status')
   puts "Use cz_publish to release your work, Meganiod!"
   puts "                                     Koros"
@@ -31,5 +31,7 @@ end
 
 
 desc "Code Zauker Publisher"
-task :cz_publish => [ :test, :yard, :build, :release] do
+task :cz_publish => [ :test, :build, :release] do
+  puts "unset HTTP_PROXY; unset http_proxy; unset https_proxy"
+  puts "rake release"
 end

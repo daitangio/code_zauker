@@ -33,7 +33,7 @@ For a sample redis configuration see the etc/ directory of the project
 * Release History
   | Version | Date        | Summary                                              |
   |---------+-------------+------------------------------------------------------|
-  |   0.0.3 |             | Added Case insensitive search UTF-8 trigram database |
+  |   0.0.3 |  3 Feb 2012 | Added Case insensitive search.UTF-8 trigram database  |
   |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.       |
   |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only)    |
   |         |             |                                                      |
