@@ -1,3 +1,5 @@
+|2012-02-03|Updated readme|
+|2012-02-03|Code Zauker ready for v0.0.3 release|
 |2012-02-02|czindexer now offers better statistic and less verbose output|
 |2012-02-02|czsearch now is able to exclude file patterns|
 |2012-02-02|Better utf-8 handling|

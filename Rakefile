@@ -24,6 +24,7 @@ desc "Code Zauker default task for generating documentation, running tests and p
 task :default => [ :test, :yard] do
   puts "Generating git Changelog..."
   system('git log --pretty="|%ad|%s|" --date=short >CHANGELOG.org')
+  system('git status')
   puts "Use cz_publish to release your work, Meganiod!"
   puts "                                     Koros"
 end
