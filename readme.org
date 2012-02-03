@@ -11,15 +11,8 @@ To install Code Zauker,simply issue
   gem install code_zauker
 #+END_SRC
 You need also [[http://redis.io/][redis-2.4.6]] or better. 
-For a sample redis configuration see the etc/ dreictory of the project
+For a sample redis configuration see the etc/ directory of the project
 
-* Release History
-  | Version | Date        | Summary                                           |
-  |---------+-------------+---------------------------------------------------|
-  |   0.0.3 |             | Added Case insensitive search                     |
-  |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.    |
-  |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only) |
-  |         |             |                                                   |
 
 ** Release Notes (details)
 ** 0.0.3
@@ -35,6 +28,15 @@ For a sample redis configuration see the etc/ dreictory of the project
 ** 0.0.1
    First "we are here" release.
 
+
+
+* Release History
+  | Version | Date        | Summary                                              |
+  |---------+-------------+------------------------------------------------------|
+  |   0.0.3 |             | Added Case insensitive search UTF-8 trigram database |
+  |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.       |
+  |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only)    |
+  |         |             |                                                      |
 
 
 * DEVELOPING
