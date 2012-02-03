@@ -58,6 +58,7 @@ def processElement(l,fs,options)
     if !toExclude && !l.include?("/.hg/") && !l.include?("/CVS/") && !l.include?("/.svn/") && !l.include?("/.git/")
       #puts "Processing File #{l}" if options[:verbose]
       startTime=Time.now
+      # zip/jar processing is automatically handled here...
       if   options[:reindex] == true          
         fs.reindex([l])
       else

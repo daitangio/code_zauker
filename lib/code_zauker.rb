@@ -4,6 +4,8 @@ require "code_zauker/constants"
 require 'redis/connection/hiredis'
 require 'redis'
 require 'set'
+require 'zip/zip'
+
 # This module implements a simple reverse indexer 
 # based on Redis
 # The idea is ispired by http://swtch.com/~rsc/regexp/regexp4.html
@@ -145,16 +147,60 @@ module CodeZauker
     private :pushTrigramsSetRecoverable
 
 
+    # = Utility function to read lines into memory
+    # We avoid a huge roundtrip to redis, and store the trigram on a memory-based set
+    # before sending it to redis. This avoid
+    # a lot of spourios work
+    def loadLines(lines,fid,filename)
+      trigramScanned=0
+      s=Set.new
+      adaptiveSize= TRIGRAM_DEFAULT_PUSH_SIZE
+      util=Util.new()
+      lines.each do  |lineNotUTF8|
+        l= util.ensureUTF8(lineNotUTF8)
+        # Split each line into 3-char chunks, and store in a redis set
+        i=0
+        for istart in 0...(l.length-GRAM_SIZE) 
+          trigram = l[istart, GRAM_SIZE]
+          # Avoid storing the 3space guy enterely
+          if trigram==SPACE_GUY
+            next
+          end
+          # push the trigram to redis (highly optimized)
+          s.add(trigram)
+          if s.length > adaptiveSize
+            pushTrigramsSet(s,fid,filename)
+            s=Set.new()             
+          end
+          trigramScanned += 1
+          #puts "#{istart} Trigram fscan:#{trigram}/  FileId: #{fid}"
+        end
+      end
+      if s.length > 0
+        pushTrigramsSet(s,fid,filename)
+        s=nil
+        #puts "Final push of #{s.length}"
+      end
+      @redis.sadd "fscan:processedFiles", "#{filename}"
+      return trigramScanned
+    end
+
+    def build_id(filename)
+      @redis.setnx "fscan:nextId",0
+      fid=@redis.incr "fscan:nextId"
+      # BUG: Consider storing it at the END of the processing
+      @redis.set "fscan:id:#{filename}", fid
+      @redis.set "fscan:id2filename:#{fid}",filename
+      return fid
+    end
+
+
     def load(filename, noReload=false)
       # Define my redis id...      
       # Already exists?...
       fid=@redis.get "fscan:id:#{filename}"
       if fid==nil 
-        @redis.setnx "fscan:nextId",0
-        fid=@redis.incr "fscan:nextId"
-        # BUG: Consider storing it at the END of the processing
-        @redis.set "fscan:id:#{filename}", fid
-        @redis.set "fscan:id2filename:#{fid}",filename
+        fid=build_id(filename)
       else
         if noReload 
           #puts "Already found #{filename} as id:#{fid} and NOT RELOADED"
@@ -162,51 +208,47 @@ module CodeZauker
         end
       end      
       # fid is the set key!...
-      trigramScanned=0
-      # TEST_LICENSE.txt: 3290 Total Scanned: 24628
-      # The ratio is below 13% of total trigrams are unique for very big files
-      # So we avoid a huge roundtrip to redis, and store the trigram on a memory-based set
-      # before sending it to redis. This avoid
-      # a lot of spourios work      
-      s=Set.new
-      File.open(filename,"r") { |f|
-        lines=f.readlines()        
-        adaptiveSize= TRIGRAM_DEFAULT_PUSH_SIZE
-        util=Util.new()
-        lines.each do  |lineNotUTF8|
-          l= util.ensureUTF8(lineNotUTF8)
-          # Split each line into 3-char chunks, and store in a redis set
-          i=0
-          for istart in 0...(l.length-GRAM_SIZE) 
-            trigram = l[istart, GRAM_SIZE]
-            # Avoid storing the 3space guy enterely
-            if trigram==SPACE_GUY
-              next
-            end
-            # push the trigram to redis (highly optimized)
-            s.add(trigram)
-            if s.length > adaptiveSize
-              pushTrigramsSet(s,fid,filename)
-              s=Set.new()             
-            end
-            trigramScanned += 1
-            #puts "#{istart} Trigram fscan:#{trigram}/  FileId: #{fid}"
-          end
+      # IS A ZIP?
+      is_zip=false
+      SUPPORTED_ARCHIVES.each do  | archiveExtension |
+        if filename.end_with?(archiveExtension)
+          is_zip=true
+          break
         end
-      }
-
-      if s.length > 0
-        pushTrigramsSet(s,fid,filename)
-        s=nil
-        #puts "Final push of #{s.length}"
       end
+      if is_zip==false 
+        trigramScanned=0
+        File.open(filename,"r") { |f|
+          lines=f.readlines()        
+          trigramScanned=loadLines(lines,fid,filename)
+          
+        }
 
+        trigramsOnFile=@redis.scard "fscan:trigramsOnFile:#{fid}"        
+        trigramRatio=( (trigramsOnFile*1.0) / trigramScanned )* 100.0
+        if trigramRatio < 10 or trigramRatio >75        
+          puts "#{filename}\n\tRatio:#{trigramRatio.round}%  Unique Trigrams:#{trigramsOnFile} Total Scanned: #{trigramScanned} ?Binary" if trigramRatio >90 and trigramsOnFile>70
+        end
 
-      trigramsOnFile=@redis.scard "fscan:trigramsOnFile:#{fid}"
-      @redis.sadd "fscan:processedFiles", "#{filename}"
-      trigramRatio=( (trigramsOnFile*1.0) / trigramScanned )* 100.0
-      if trigramRatio < 10 or trigramRatio >75        
-        puts "#{filename}\n\tRatio:#{trigramRatio.round}%  Unique Trigrams:#{trigramsOnFile} Total Scanned: #{trigramScanned} ?Binary" if trigramRatio >90 and trigramsOnFile>70
+      else
+        # Explode the zip and process it one by one...
+        archive=Zip::ZipFile.new(filename)
+        archive.each_with_index {
+          |entry, index|
+          if entry.file?()
+            virtual_name="zip://"+filename+"/"+entry.name()
+            vid=@redis.get "fscan:id:#{virtual_name}"
+            if vid==nil 
+              vid=build_id(filename)
+            else
+              puts " Already found...#{vid}"
+            end
+            puts " * #{virtual_name}"
+            lines=entry.get_input_stream().readlines()
+            trigramScanned=loadLines(lines,vid,filename)
+            puts "#{virtual_name}\n\tTrigrams:#{trigramScanned}"            
+          end
+        }
       end
       return nil
     end
