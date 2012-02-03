@@ -122,26 +122,55 @@ href="http://swtch.com/~rsc/regexp/regexp4.html">swtch.com/~rsc/regexp/regexp4.h
         </dt>
         <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.0.3</span><span class='tstring_end'>&quot;</span></span></pre></dd>
       
+        <dt id="MAX_PUSH_TRIGRAM_RETRIES-constant" class="">MAX_PUSH_TRIGRAM_RETRIES =
+          
+        </dt>
+        <dd><pre class="code"><span class='int'>3</span></pre></dd>
+      
+        <dt id="TRIGRAM_DEFAULT_PUSH_SIZE-constant" class="">TRIGRAM_DEFAULT_PUSH_SIZE =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Stats  It is difficult to decide what is the best trigram push size. a
+larger one ensure a best in memory processing but can lead to longer
+transactions 6000 Ehuristic value used for historical reasons</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>6000</span></pre></dd>
+      
         <dt id="DEFAULT_EXCLUDED_EXTENSION-constant" class="">DEFAULT_EXCLUDED_EXTENSION =
           
         </dt>
         <dd><pre class="code"><span class='lbracket'>[</span>
-<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.pdf</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+<span class='comment'># Documents
+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.pdf</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
 <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.xps</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.zip</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.ppt</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.xls</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.rtf</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.vsd</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>  
-<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.dll</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.exe</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.out</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.elf</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.lib</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.so</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.jar</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.class</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.zip</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.7z</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+<span class='comment'># MS Office zip-like files...
+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.pptx</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.docx</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.xlsx</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.ppt</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.xls</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.rtf</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.vsd</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.odf</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+<span class='comment'># Binary bad stuff
+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.dll</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.exe</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.out</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.elf</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.lib</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.so</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+<span class='comment'># Redis db
+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.rdb</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+<span class='comment'># Ruby and java stuff-like
+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.gem</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.jar</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.class</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.ear</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.war</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
 <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.tar</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
 <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.gz</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
 <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.dropbox</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.svn-base</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.pdb</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.cache</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-<span class='comment'># MS Office zip-like files...
-</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.pptx</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.docx</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.xlsx</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+<span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.svn-base</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.pdb</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.cache</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>                             
 <span class='comment'># Music exclusion
 </span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.mp3</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.mp4</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.wav</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
 <span class='comment'># Image exclusion
-</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.png</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.gif</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.png</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.gif</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.jpg</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.bmp</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
 <span class='comment'># Temp stuff
 </span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.tmp</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>~</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
 <span class='comment'># Oracle exports...
@@ -160,7 +189,7 @@ href="http://swtch.com/~rsc/regexp/regexp4.html">swtch.com/~rsc/regexp/regexp4.h
 </div>
     
     <div id="footer">
-  Generated on Mon Jan 30 18:24:23 2012 by 
+  Generated on Fri Feb  3 10:08:03 2012 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.7.4 (ruby-1.9.3).
 </div>

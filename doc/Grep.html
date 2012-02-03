@@ -77,58 +77,7 @@
 </dl>
 <div class="clear"></div>
 
-<h2>Overview</h2><div class="docstring">
-  <div class="discussion">
-    
-<p>GG Customized to suite Code Zauker needs Refer to <a
-href="https://rubygems.org/gems/grep">rubygems.org/gems/grep</a> for the
-original gem/code Skeleton module for the 'grep' routine.</p>
 
-<p>Ideally, one would do this in their code to import the "grep" call directly
-into their current namespace:</p>
-
-<pre class="code"><span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>grep</span><span class='tstring_end'>'</span></span>
-<span class='id identifier rubyid_include'>include</span> <span class='const'>Grep</span>
-<span class='comment'># do something with grep()</span></pre>
-
-<p>It is recommended that you look at the documentation for the grep() call
-directly for specific usage.</p>
-
-<p>--</p>
-
-<p>The compilation of software known as grep.rb is distributed under the
-following terms: Copyright (C) 2005-2006 Erik Hollensbe. All rights
-reserved.</p>
-
-<p>Redistribution and use in source form, with or without modification, are
-permitted provided that the following conditions are met:</p>
-<ol><li>
-<p>Redistributions of source code must retain the above copyright</p>
-</li></ol>
-
-<pre class="code">notice, this list of conditions and the following disclaimer.</pre>
-
-<p>THIS SOFTWARE IS PROVIDED BY AUTHOR AND CONTRIBUTORS "AS IS" AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED.  IN NO EVENT SHALL AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-DAMAGE.</p>
-
-<p>++</p>
-
-
-  </div>
-</div>
-<div class="tags">
-  
-
-</div>
 
 
 
@@ -204,7 +153,6 @@ will be printed.</p>
       <pre class="lines">
 
 
-57
 58
 59
 60
@@ -278,10 +226,20 @@ will be printed.</p>
 128
 129
 130
-131</pre>
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker/grep.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker/grep.rb', line 58</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_grep'>grep</span><span class='lparen'>(</span><span class='id identifier rubyid_file'>file</span><span class='comma'>,</span> <span class='id identifier rubyid_pattern'>pattern</span><span class='comma'>,</span> <span class='id identifier rubyid_pre_context'>pre_context</span><span class='op'>=</span><span class='int'>0</span><span class='comma'>,</span> <span class='id identifier rubyid_post_context'>post_context</span><span class='op'>=</span><span class='int'>0</span><span class='comma'>,</span> <span class='id identifier rubyid_print_filename'>print_filename</span><span class='op'>=</span><span class='kw'>true</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_currentline'>currentline</span><span class='op'>=</span><span class='int'>0</span>
@@ -307,9 +265,12 @@ will be printed.</p>
   <span class='id identifier rubyid_cache'>cache</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
 
+  <span class='id identifier rubyid_util'>util</span><span class='op'>=</span><span class='const'>CodeZauker</span><span class='op'>::</span><span class='const'>Util</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='rparen'>)</span>
+
   <span class='id identifier rubyid_loop'>loop</span> <span class='kw'>do</span>
     <span class='kw'>begin</span>
-      <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_readline'>readline</span>
+      <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='id identifier rubyid_util'>util</span><span class='period'>.</span><span class='id identifier rubyid_ensureUTF8'>ensureUTF8</span><span class='lparen'>(</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_readline'>readline</span><span class='rparen'>)</span>
+      
       <span class='id identifier rubyid_currentline'>currentline</span> <span class='op'>+=</span><span class='int'>1</span>
       <span class='id identifier rubyid_cache'>cache</span><span class='period'>.</span><span class='id identifier rubyid_shift'>shift</span> <span class='kw'>unless</span> <span class='id identifier rubyid_cache'>cache</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_pre_context'>pre_context</span>
 
@@ -320,9 +281,9 @@ will be printed.</p>
         <span class='id identifier rubyid_cache'>cache</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
         <span class='kw'>if</span> <span class='id identifier rubyid_post_context'>post_context</span> <span class='op'>&gt;</span> <span class='int'>0</span>
           <span class='id identifier rubyid_post_context'>post_context</span><span class='period'>.</span><span class='id identifier rubyid_times'>times</span> <span class='kw'>do</span>
-            <span class='kw'>begin</span>
-              <span class='comment'>#lines.push(file.readline) 
-</span>              <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_currentline'>currentline</span><span class='rbrace'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_readline'>readline</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>                
+            <span class='kw'>begin</span>                
+              <span class='id identifier rubyid_utf8line'>utf8line</span><span class='op'>=</span><span class='id identifier rubyid_util'>util</span><span class='period'>.</span><span class='id identifier rubyid_ensureUTF8'>ensureUTF8</span><span class='lparen'>(</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_readline'>readline</span><span class='rparen'>)</span>
+              <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_currentline'>currentline</span><span class='rbrace'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_utf8line'>utf8line</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>                
               <span class='id identifier rubyid_currentline'>currentline</span> <span class='op'>+=</span><span class='int'>1</span>
             <span class='kw'>rescue</span> <span class='const'>IOError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
               <span class='kw'>break</span>
@@ -332,12 +293,18 @@ will be printed.</p>
       <span class='kw'>end</span>
     <span class='kw'>rescue</span> <span class='const'>IOError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
       <span class='kw'>break</span>
-    <span class='kw'>end</span>
+    <span class='kw'>rescue</span> <span class='const'>ArgumentError</span> <span class='op'>=&gt;</span><span class='id identifier rubyid_e2'>e2</span>
+      <span class='comment'># Rethrow a probably UTF-8 fatal error
+</span>      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Pattern Matching failed on \n\t</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_fileName'>fileName</span><span class='rbrace'>}</span><span class='tstring_content'>\n\tLine:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_line'>line</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Encoding of line:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_encoding'>encoding</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rbrace'>}</span><span class='tstring_content'> Valid? </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_valid_encoding?'>valid_encoding?</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+      <span class='comment'>#raise e2
+</span>    <span class='kw'>end</span>
   <span class='kw'>end</span>
   
 
-  <span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_each_line'>each_line</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span>
+  <span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_each_line'>each_line</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_untrustedLine'>untrustedLine</span><span class='op'>|</span>
     <span class='id identifier rubyid_cache'>cache</span><span class='period'>.</span><span class='id identifier rubyid_shift'>shift</span> <span class='kw'>unless</span> <span class='id identifier rubyid_cache'>cache</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_pre_context'>pre_context</span>
+    <span class='id identifier rubyid_line'>line</span><span class='op'>=</span><span class='id identifier rubyid_util'>util</span><span class='period'>.</span><span class='id identifier rubyid_ensureUTF8'>ensureUTF8</span><span class='lparen'>(</span><span class='id identifier rubyid_untrustedLine'>untrustedLine</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_cache'>cache</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
 
     <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span> <span class='op'>=~</span> <span class='id identifier rubyid_pattern'>pattern</span>
@@ -345,8 +312,8 @@ will be printed.</p>
       <span class='kw'>if</span> <span class='id identifier rubyid_post_context'>post_context</span> <span class='op'>&gt;</span> <span class='int'>0</span>
         <span class='id identifier rubyid_post_context'>post_context</span><span class='period'>.</span><span class='id identifier rubyid_times'>times</span> <span class='kw'>do</span>
           <span class='kw'>begin</span>
-            <span class='comment'>#lines.push(file.readline) 
-</span>            <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_currentline'>currentline</span><span class='rbrace'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_readline'>readline</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+            <span class='id identifier rubyid_utf8line'>utf8line</span><span class='op'>=</span><span class='id identifier rubyid_util'>util</span><span class='period'>.</span><span class='id identifier rubyid_ensureUTF8'>ensureUTF8</span><span class='lparen'>(</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_readline'>readline</span><span class='rparen'>)</span>
+            <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_currentline'>currentline</span><span class='rbrace'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_utf8line'>utf8line</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>  
             <span class='id identifier rubyid_currentline'>currentline</span> <span class='op'>+=</span><span class='int'>1</span>
           <span class='kw'>rescue</span> <span class='const'>Exception</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
             <span class='kw'>break</span>
@@ -368,7 +335,7 @@ will be printed.</p>
 </div>
     
     <div id="footer">
-  Generated on Mon Jan 30 18:24:24 2012 by 
+  Generated on Fri Feb  3 10:08:04 2012 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.7.4 (ruby-1.9.3).
 </div>

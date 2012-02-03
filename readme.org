@@ -24,6 +24,10 @@ For a sample redis configuration see the etc/ dreictory of the project
 ** Release Notes (details)
 ** 0.0.3
    Fully implemented case insensitive search
+   + czindexer supports reindexing, verbose output
+   + czsearcher supports case insenstive search, file exclusion, context clipping
+   + Now Code Zauker handle Windows ISO file in a nice way. 
+   *The whole trigram database will be stored in UTF-8*
 ** 0.0.2
    Code Cleanup, reindexing features, and sample redis server config
    czsearch now do not relay on unix grep, so it is easier to use with jruby

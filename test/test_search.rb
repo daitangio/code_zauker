@@ -98,14 +98,14 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     fs=CodeZauker::FileScanner.new()
     fs.load("./test/fixture/kurukku.txt", noReload=true)
     flist=fs.isearch("caseinsensitive Search TEST.")
-    assert flist[0] =="./test/fixture/kurukku.txt", "Case insensitive search failed. #{flist}"
+    assert flist.include?("./test/fixture/kurukku.txt"), "Case insensitive search failed. #{flist}"
   end
 
   def test_case_insensitive2
     fs=CodeZauker::FileScanner.new()
     fs.load("./test/fixture/kurukku.txt", noReload=true)
     flist=fs.isearch("caSeinsenSitive Search TEST.")
-    assert flist[0] =="./test/fixture/kurukku.txt", "Case insensitive search failed. #{flist}"
+    assert flist.include?("./test/fixture/kurukku.txt"), "Case insensitive search failed. #{flist}"
     assert fs.search("caSeinsenSitive").length==0, "Case Sensitive Search failed"
   end
 
