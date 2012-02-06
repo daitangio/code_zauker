@@ -6,8 +6,7 @@ module CodeZauker
   # 6000 Ehuristic value used for historical reasons
   TRIGRAM_DEFAULT_PUSH_SIZE=6000
   DEFAULT_EXCLUDED_EXTENSION=[
-                              # Documents
-                              ".pdf",
+                              # Documents                             
                               ".xps",
                               ".zip",".7z",
                               # MS Office zip-like files...
@@ -20,8 +19,9 @@ module CodeZauker
                               # Ruby and java stuff-like
                               ".gem",
                               ".jar",".class",".ear",".war",
+                              ".mar",
                               ".tar",
-                              ".gz",
+                              ".gz",".Z",
                               ".dropbox",
                               ".svn-base",".pdb",".cache",                             
                               # Music exclusion

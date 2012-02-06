@@ -21,11 +21,13 @@ Gem::Specification.new do |s|
   # specify any dependencies here; for example:
   # s.add_development_dependency "rspec"
   s.add_development_dependency "yard", "~>0.7"
+  s.add_development_dependency "rubyzip", "~> 0.9"
 
   s.add_runtime_dependency "hiredis", "~> 0.3"
   s.add_runtime_dependency "redis", "~> 2.2"
-  s.add_runtime_dependency "rubyzip", "~> 0.9"
+  s.add_runtime_dependency "pdf-reader", "~> 1.0.0"
 
+  
   ## Install and require the hiredis gem before redis-rb for maximum performances.
   #s.add_runtime_dependency "redis", "~> 2.2", :require => ["redis/connection/hiredis", "redis"]
   

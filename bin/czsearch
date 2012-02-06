@@ -4,6 +4,8 @@
 $VERBOSE=nil 
 require 'code_zauker'
 require 'code_zauker/grep'
+require 'tempfile'
+require 'pdf/reader'
 include Grep
 
 require 'optparse'
@@ -61,6 +63,7 @@ optparse.parse!
 
 ARGV.each do | s |
   #puts "Code Zauker Searching for #{s}"  
+  util=CodeZauker::Util.new()
   fs=CodeZauker::FileScanner.new()
   if options[:ignorecase]==false
     files=fs.search(s)
@@ -85,9 +88,25 @@ ARGV.each do | s |
     end
     if !to_exclude
       begin
-        lines=grep(f,pattern, pre_context=options[:precontext], post_context=options[:postcontext]);
-        lines.each do |l |
-          puts "#{f}:#{l}"
+        if util.is_pdf?(f)==false
+          lines=grep(f,pattern, pre_context=options[:precontext], post_context=options[:postcontext]);
+          lines.each do |l |
+            puts "#{f}:#{l}"
+          end
+        else
+          puts "#{f} Pdf matches"
+          #Using pdf/reader we can do a search here but we must store the stuff 
+          # in a temp file
+          
+          tempfile =Tempfile.new("czsearch_pdf.tmp")
+          tempfile.write(util.get_lines(f).join("\n"))
+          tempfile.close
+          #puts "Temp PDF into #{tempfile.path}"
+          lines=grep(tempfile.path,pattern, pre_context=options[:precontext], post_context=options[:postcontext]);
+          lines.each do |l |
+            puts "#{f}:#{l}"
+          end
+          tempfile.unlink
         end
       rescue ArgumentError => ioe
         puts "FATAL ArgumentError on #{f}"

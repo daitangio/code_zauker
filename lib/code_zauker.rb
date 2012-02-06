@@ -4,6 +4,7 @@ require "code_zauker/constants"
 require 'redis/connection/hiredis'
 require 'redis'
 require 'set'
+require 'pdf/reader'
 # This module implements a simple reverse indexer 
 # based on Redis
 # The idea is ispired by http://swtch.com/~rsc/regexp/regexp4.html
@@ -72,6 +73,37 @@ module CodeZauker
       end
     end
 
+    def is_pdf?(filename)
+      return filename.downcase().end_with?(".pdf")
+    end
+
+    # Obtain lines from a filename
+    # It works even with pdf files
+    def get_lines(filename)
+      lines=[]
+      if self.is_pdf?(filename)
+        # => enable pdf processing....
+        #puts "PDF..."
+        File.open(filename, "rb") do |io|
+          reader = PDF::Reader.new(io)
+          #puts "PDF Scanning...#{reader.info}"
+          reader.pages.each do |page|
+            linesToTrim=page.text.split("\n")
+            linesToTrim.each do |l|
+              lines.push(l.strip())
+            end
+          end
+          #puts "PDF Lines:#{lines.length}"
+        end
+      else
+        File.open(filename,"r") { |f|
+          lines=f.readlines()        
+        }
+      end
+      return lines
+    end
+
+
   end
 
   # Scan a file and push it inside redis...
@@ -128,7 +160,11 @@ module CodeZauker
 
     def pushTrigramsSetRecoverable(s, fid, filename)
       error=false
-      @redis.multi do
+      # @redis.multi do
+      # From 5.8 
+      # to   7.6 Files per sec
+      # changing multi into pipielined
+      @redis.pipelined do 
         s.each do | trigram |        
           @redis.sadd "trigram:#{trigram}",fid
           @redis.sadd "fscan:trigramsOnFile:#{fid}", trigram
@@ -139,7 +175,7 @@ module CodeZauker
             error=true          
           end
         end
-      end # multi
+      end # multi/pipelined
       return error
     end
     private :pushTrigramsSetRecoverable
@@ -169,31 +205,31 @@ module CodeZauker
       # before sending it to redis. This avoid
       # a lot of spourios work      
       s=Set.new
-      File.open(filename,"r") { |f|
-        lines=f.readlines()        
-        adaptiveSize= TRIGRAM_DEFAULT_PUSH_SIZE
-        util=Util.new()
-        lines.each do  |lineNotUTF8|
-          l= util.ensureUTF8(lineNotUTF8)
-          # Split each line into 3-char chunks, and store in a redis set
-          i=0
-          for istart in 0...(l.length-GRAM_SIZE) 
-            trigram = l[istart, GRAM_SIZE]
-            # Avoid storing the 3space guy enterely
-            if trigram==SPACE_GUY
-              next
-            end
-            # push the trigram to redis (highly optimized)
-            s.add(trigram)
-            if s.length > adaptiveSize
-              pushTrigramsSet(s,fid,filename)
-              s=Set.new()             
-            end
-            trigramScanned += 1
-            #puts "#{istart} Trigram fscan:#{trigram}/  FileId: #{fid}"
+      util=Util.new()
+      lines=util.get_lines(filename)
+      adaptiveSize= TRIGRAM_DEFAULT_PUSH_SIZE
+
+      lines.each do  |lineNotUTF8|
+        l= util.ensureUTF8(lineNotUTF8)
+        # Split each line into 3-char chunks, and store in a redis set
+        i=0
+        for istart in 0...(l.length-GRAM_SIZE) 
+          trigram = l[istart, GRAM_SIZE]
+          # Avoid storing the 3space guy enterely
+          if trigram==SPACE_GUY
+            next
           end
+          # push the trigram to redis (highly optimized)
+          s.add(trigram)
+          if s.length > adaptiveSize
+            pushTrigramsSet(s,fid,filename)
+            s=Set.new()             
+          end
+          trigramScanned += 1
+          #puts "#{istart} Trigram fscan:#{trigram}/  FileId: #{fid}"
         end
-      }
+      end
+      
 
       if s.length > 0
         pushTrigramsSet(s,fid,filename)
