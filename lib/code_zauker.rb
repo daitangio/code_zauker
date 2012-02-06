@@ -185,17 +185,51 @@ module CodeZauker
       return trigramScanned
     end
 
+    # Allocate a new file entry
+    # Also ensure a special hash for zip files
+    # 
     def build_id(filename)
       @redis.setnx "fscan:nextId",0
       fid=@redis.incr "fscan:nextId"
       # BUG: Consider storing it at the END of the processing
       @redis.set "fscan:id:#{filename}", fid
       @redis.set "fscan:id2filename:#{fid}",filename
+      # Build a hash set used for storing data...
+      @redis.hmset "fscan:prop:#{filename}","created",Time.now.to_s()
       return fid
     end
 
+    def loadZip(filename,noReload=false)
+      # Explode the zip and process it one by one...
+      archive=Zip::ZipFile.new(filename)
+      @redis.hset "fscan:prop:#{filename}", "is_zip",true
+      
+      archive.each_with_index {
+        |entry, index|
+        if entry.file?()
+          virtual_name="zip://"+filename+"/"+entry.name()
+          vid=@redis.get "fscan:id:#{virtual_name}"
+          if vid==nil 
+            vid=build_id(filename)
+          else
+            # At the moment it is an error...
+            # if you request a reload...
+            if noReload==false
+              raise " Already found... #{virtual_name} as ID= #{vid}"
+            else             
+              return nil
+            end
+          end
+          puts " * #{virtual_name}"
+          @redis.append "fscan:zip:#{filename}",entry.name()
+          lines=entry.get_input_stream().readlines()
+          trigramScanned=loadLines(lines,vid,filename)
+          puts "#{virtual_name}\n\tTrigrams:#{trigramScanned}"            
+        end
+      }
+    end
 
-    def load(filename, noReload=false)
+    def loadPlainFile(filename,noReload=false)
       # Define my redis id...      
       # Already exists?...
       fid=@redis.get "fscan:id:#{filename}"
@@ -208,7 +242,23 @@ module CodeZauker
         end
       end      
       # fid is the set key!...
-      # IS A ZIP?
+      trigramScanned=0
+      File.open(filename,"r") { |f|
+        lines=f.readlines()        
+        trigramScanned=loadLines(lines,fid,filename)
+        
+      }
+
+      trigramsOnFile=@redis.scard "fscan:trigramsOnFile:#{fid}"        
+      trigramRatio=( (trigramsOnFile*1.0) / trigramScanned )* 100.0
+      if trigramRatio < 10 or trigramRatio >75        
+        puts "#{filename}\n\tRatio:#{trigramRatio.round}%  Unique Trigrams:#{trigramsOnFile} Total Scanned: #{trigramScanned} ?Binary" if trigramRatio >90 and trigramsOnFile>70
+      end
+
+    end
+
+
+    def load(filename, noReload=false)
       is_zip=false
       SUPPORTED_ARCHIVES.each do  | archiveExtension |
         if filename.end_with?(archiveExtension)
@@ -217,38 +267,9 @@ module CodeZauker
         end
       end
       if is_zip==false 
-        trigramScanned=0
-        File.open(filename,"r") { |f|
-          lines=f.readlines()        
-          trigramScanned=loadLines(lines,fid,filename)
-          
-        }
-
-        trigramsOnFile=@redis.scard "fscan:trigramsOnFile:#{fid}"        
-        trigramRatio=( (trigramsOnFile*1.0) / trigramScanned )* 100.0
-        if trigramRatio < 10 or trigramRatio >75        
-          puts "#{filename}\n\tRatio:#{trigramRatio.round}%  Unique Trigrams:#{trigramsOnFile} Total Scanned: #{trigramScanned} ?Binary" if trigramRatio >90 and trigramsOnFile>70
-        end
-
+        loadPlainFile(filename,noReload)
       else
-        # Explode the zip and process it one by one...
-        archive=Zip::ZipFile.new(filename)
-        archive.each_with_index {
-          |entry, index|
-          if entry.file?()
-            virtual_name="zip://"+filename+"/"+entry.name()
-            vid=@redis.get "fscan:id:#{virtual_name}"
-            if vid==nil 
-              vid=build_id(filename)
-            else
-              puts " Already found...#{vid}"
-            end
-            puts " * #{virtual_name}"
-            lines=entry.get_input_stream().readlines()
-            trigramScanned=loadLines(lines,vid,filename)
-            puts "#{virtual_name}\n\tTrigrams:#{trigramScanned}"            
-          end
-        }
+        loadZip(filename,noReload)
       end
       return nil
     end
@@ -368,6 +389,7 @@ module CodeZauker
         #putc "\n"
         
         @redis.del  "fscan:id:#{filename}", "fscan:trigramsOnFile:#{fid}", "fscan:id2filename:#{fid}"
+        @redis.del  "fscan:prop:#{filename}"
         @redis.srem "fscan:processedFiles",  filename
       end
       return nil
