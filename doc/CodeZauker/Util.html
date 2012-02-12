@@ -6,7 +6,7 @@
 <title>
   Class: CodeZauker::Util
   
-    &mdash; Code Zauker 0.0.3 Documentation
+    &mdash; Code Zauker 0.0.4 Documentation
   
 </title>
 
@@ -108,6 +108,8 @@
 
 
 
+
+
   
     <h2>
       Instance Method Summary
@@ -140,6 +142,50 @@ href="http://blog.grayproductions.net/articles/ruby_19s_string">blog.grayproduct
 This code try to "guess" the right encoding switching to ISO-8859-1 if
 UTF-8 is not valid.</p>
 </div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_lines-instance_method" title="#get_lines (instance method)">- (Object) <strong>get_lines</strong>(filename) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Obtain lines from a filename It works even with pdf files.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#is_pdf%3F-instance_method" title="#is_pdf? (instance method)">- (Boolean) <strong>is_pdf?</strong>(filename) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -207,7 +253,6 @@ interpreted as a UTF-8  whereas it is a ISO-8859 windows code.</p>
       <pre class="lines">
 
 
-56
 57
 58
 59
@@ -224,10 +269,11 @@ interpreted as a UTF-8  whereas it is a ISO-8859 windows code.</p>
 70
 71
 72
-73</pre>
+73
+74</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ensureUTF8'>ensureUTF8</span><span class='lparen'>(</span><span class='id identifier rubyid_untrusted_string'>untrusted_string</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_untrusted_string'>untrusted_string</span><span class='period'>.</span><span class='id identifier rubyid_valid_encoding?'>valid_encoding?</span><span class='lparen'>(</span><span class='rparen'>)</span><span class='op'>==</span><span class='kw'>false</span> 
@@ -246,6 +292,135 @@ interpreted as a UTF-8  whereas it is a ISO-8859 windows code.</p>
   <span class='kw'>else</span>
     <span class='kw'>return</span> <span class='id identifier rubyid_untrusted_string'>untrusted_string</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="get_lines-instance_method">
+  
+    - (<tt>Object</tt>) <strong>get_lines</strong>(filename) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    
+<p>Obtain lines from a filename It works even with pdf files</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 82</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_lines'>get_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_lines'>lines</span><span class='op'>=</span><span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_is_pdf?'>is_pdf?</span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='rparen'>)</span>
+    <span class='comment'># =&gt; enable pdf processing....
+</span>    <span class='comment'>#puts &quot;PDF...&quot;
+</span>    <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_open'>open</span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rb</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_io'>io</span><span class='op'>|</span>
+      <span class='id identifier rubyid_reader'>reader</span> <span class='op'>=</span> <span class='const'>PDF</span><span class='op'>::</span><span class='const'>Reader</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_io'>io</span><span class='rparen'>)</span>
+      <span class='comment'>#puts &quot;PDF Scanning...#{reader.info}&quot;
+</span>      <span class='id identifier rubyid_reader'>reader</span><span class='period'>.</span><span class='id identifier rubyid_pages'>pages</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_page'>page</span><span class='op'>|</span>
+        <span class='id identifier rubyid_linesToTrim'>linesToTrim</span><span class='op'>=</span><span class='id identifier rubyid_page'>page</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_linesToTrim'>linesToTrim</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_l'>l</span><span class='op'>|</span>
+          <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_l'>l</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='lparen'>(</span><span class='rparen'>)</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+      <span class='kw'>end</span>
+      <span class='comment'>#puts &quot;PDF Lines:#{lines.length}&quot;
+</span>    <span class='kw'>end</span>
+  <span class='kw'>else</span>
+    <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_open'>open</span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>r</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+      <span class='id identifier rubyid_lines'>lines</span><span class='op'>=</span><span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_readlines'>readlines</span><span class='lparen'>(</span><span class='rparen'>)</span>        
+    <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_lines'>lines</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="is_pdf?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>is_pdf?</strong>(filename) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+76
+77
+78</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 76</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_is_pdf?'>is_pdf?</span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_filename'>filename</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='lparen'>(</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_end_with?'>end_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.pdf</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -277,7 +452,6 @@ TODO: Very bad implementation, need improvements</p>
       <pre class="lines">
 
 
-19
 20
 21
 22
@@ -306,10 +480,11 @@ TODO: Very bad implementation, need improvements</p>
 45
 46
 47
-48</pre>
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 19</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 20</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_mixCase'>mixCase</span><span class='lparen'>(</span><span class='id identifier rubyid_trigram'>trigram</span><span class='rparen'>)</span> 
   <span class='id identifier rubyid_caseMixedElements'>caseMixedElements</span><span class='op'>=</span><span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -351,9 +526,9 @@ TODO: Very bad implementation, need improvements</p>
 </div>
     
     <div id="footer">
-  Generated on Fri Feb  3 17:18:43 2012 by 
+  Generated on Sun Feb 12 19:16:26 2012 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.7.4 (ruby-1.9.3).
+  0.7.5 (ruby-1.9.3).
 </div>
 
   </body>
