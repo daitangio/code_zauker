@@ -14,26 +14,10 @@ You need also [[http://redis.io/][redis-2.4.6]] or better.
 For a sample redis configuration see the etc/ directory of the project
 
 
-** Release Notes (details)
-** 0.0.3
-   Fully implemented case insensitive search
-   + czindexer supports reindexing, verbose output
-   + czsearcher supports case insenstive search, file exclusion, context clipping
-   + Now Code Zauker handle Windows ISO file in a nice way. 
-   *The whole trigram database will be stored in UTF-8*
-** 0.0.2
-   Code Cleanup, reindexing features, and sample redis server config
-   czsearch now do not relay on unix grep, so it is easier to use with jruby
-   czsearch/czindexer supports options
-** 0.0.1
-   First "we are here" release.
-
-
-
 * Release History
   | Version | Date        | Summary                                              |
   |---------+-------------+------------------------------------------------------|
-  |   0.0.4 | 10 Feb 2012 | PDF Searching                                        |
+  |   0.0.4 | 12 Feb 2012 | PDF Searching                                        |
   |   0.0.3 | 03 Feb 2012 | Added Case insensitive search.UTF-8 trigram database |
   |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.       |
   |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only)    |
