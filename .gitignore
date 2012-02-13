@@ -4,3 +4,4 @@ Gemfile.lock
 pkg/*
 code_zauker_index.rdb
 .yardoc
+publishMe
