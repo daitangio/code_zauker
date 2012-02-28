@@ -14,9 +14,7 @@ get '/search' do
   # Process the search and show the results...
   fs=CodeZauker::FileScanner.new()
   files=fs.isearch(params[:q])
-  # Example of locals usage: erb "<%= foo %>", :locals => {:foo => "bar"}
-  "Results for #{params[:q]}...\n#{files}"
-  
+  erb :show_results, :locals => {:files => files, :q => params[:q] }
 end
 
 configure do
@@ -29,10 +27,10 @@ configure do
 
 end
 
-# INLINE Template Follows
+# INLINE Template Follows: unused at the moment
 __END__
 
-@@ index
+@@ indexUnused
 <html>
 <head>
 <title> CodeZauker v<%= CodeZauker::VERSION %> </title>

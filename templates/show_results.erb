@@ -1,0 +1,25 @@
+<html>
+<head>
+<title> CodeZauker v<%= CodeZauker::VERSION %> Results on <%= q %></title>
+</head>
+<body>
+<h2>Search term:
+ <form method="get" action="/search">
+      <input type="text" name="q"  value="<%=q%>" />
+ </form>
+</h2>
+<br/>
+<h2> Search Results: <%=files.length%></h2>
+<ol>
+<%
+ files.each do |f|
+%>
+<li><%=f%>
+<%   
+ end
+%>
+</ol>
+</body>
+
+</html>
+
