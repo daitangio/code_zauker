@@ -26,6 +26,31 @@ For a sample redis configuration see the etc/ directory of the project
   |         |             |                                                      |
 
 
+* SQL Lite plugin
+The sqlite plugin is an experimental branch for replacing redis with a api-compatibility layer based on sql-lite.
+This plugin aims to provide 
+1. an embedded solution
+2. a less resource hangry implementation
+
+
+First relase is quite fast when working only on memory, and can get good performance on file system too:
+#+BEGIN_SRC sh
+
+
+
+
+time bin/czindexer -S :memory: -f  /k/code/code_zauker/
+End:48 files Files per sec:2.153639026673998
+
+real    0m24.551s
+user    0m21.065s
+sys     0m1.692s
+
+#+END_SRC
+
+
+
+
 * DEVELOPING
 For developing with Code Zauker you need bundler 1.0.21 or above
 See devel.org file

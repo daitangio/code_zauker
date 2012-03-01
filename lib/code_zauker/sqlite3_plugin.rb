@@ -66,7 +66,7 @@ INDEXES
     end
 
     def srem(key,elem)
-      @db.execute( "delete from unordered_set where name='#{key}' and  elem='#{elem}'" )
+      @db.query( "delete from unordered_set where name=:k and  elem=:e", :k=>key, :e=>elem )
     end
 
     # Returns the members of the set resulting from the intersection of all the given sets.
@@ -142,6 +142,19 @@ INDEXES
         @db.rollback()
         raise e
       end
+    end
+
+    #Increments the number stored at key by one. 
+    #If the key does not exist, it is set to 0 before performing the operation. 
+    def incr(key)
+      prev=get(key)
+      if prev==nil
+        v=1        
+      else
+        v=prev.to_i()+1
+      end
+      set(key,v.to_s())
+      return v
     end
 
     # Returns all keys matching pattern

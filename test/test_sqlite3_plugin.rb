@@ -152,5 +152,20 @@ class Sqlite3PluginBasicApiTest < Test::Unit::TestCase
      $plugin.quit()
   end
 
+  def test_incr1
+    $plugin.del("incr")
+    $plugin.incr("incr")
+    v=$plugin.get("incr").to_i()
+    assert v==1, "Key is not set to 1: #{v}"
+  end
+
+  def test_incr2
+    $plugin.set("incr","2")
+    $plugin.incr("incr")
+    v=$plugin.get("incr").to_i()
+    assert v==3, "Key is not set to 3: #{v}"
+  end
+
+
 end
 

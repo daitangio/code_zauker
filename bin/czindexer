@@ -3,10 +3,14 @@
 # find test/fixture/ -type f | xargs -P 5  -n 10 ./bin/czindexer
 # will fire 5 czindexer each with 10 files to process...
 require 'optparse'
+require 'redis'
+require "code_zauker/sqlite3_plugin"
+
 options={}
 optparse= OptionParser.new do  |opts|
   opts.banner="Usage: czindexer [options] [file1] [file2]..."
   options[:verbose] = false
+  options[:driver]=Redis.new
 
   opts.on( '-v', '--verbose', 'Output more information' ) do
     options[:verbose] = true
@@ -15,6 +19,19 @@ optparse= OptionParser.new do  |opts|
   options[:reindex]=false
   opts.on( '-f', '--force-reindex', 'Force Reindex (default:false)') do
     options[:reindex]=true
+  end
+
+  opts.on('-S', '--sql-lite-db PATH_TO_DB', String, 'Enable experimental sqlite3 plugin') do | db |
+    
+    if File.exists?( db ) ==false
+      puts "INITIALIZING DB..."
+      options[:driver]=CodeZauker::SQLite3Store.new(db)
+      options[:driver].init_db
+    else
+      options[:driver]=CodeZauker::SQLite3Store.new(db)
+    end
+    options[:driver].connect
+    
   end
 
   opts.on( '-h', '--help', 'Display this screen' ) do
@@ -82,7 +99,7 @@ end
 begin  
   $CUMULATED_TIME=0
   # Allocated here to recycle connection
-  fs=CodeZauker::FileScanner.new()
+  fs=CodeZauker::FileScanner.new(options[:driver])
   $PROCESSED_FILES=0
   puts "Code Zauker v#{CodeZauker::VERSION}" if  options[:verbose]
   puts "Reindexing..." if options[:verbose]==true and options[:reindex]==true
