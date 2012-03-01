@@ -10,6 +10,7 @@ if File.exists?(testdb)
 end
 $plugin=CodeZauker::SQLite3Store.new(testdb)
 $plugin.init_db
+$plugin.connect
 
 class Sqlite3PluginBasicApiTest < Test::Unit::TestCase
   def test_sadd
@@ -48,32 +49,107 @@ class Sqlite3PluginBasicApiTest < Test::Unit::TestCase
     assert scardz==3, "expected size three, returned instead: #{scardz}"
   end
 
-  def test_smembers
-    $plugin.smembers()
+  def test_smembers1
+    assert $plugin.smembers("notesistent").length==0
   end
 
-  def test_set
-    $plugin.set()
+
+  def test_smembers2
+    $plugin.sadd "smembers2k1","a"
+    s=$plugin.smembers("smembers2k1").length
+    assert s==1, "Expected one result, got #{s}"
   end
 
-  def test_get
-    $plugin.get()
+
+  def test_set_get1
+    $plugin.set("test_set","a")
+    r=$plugin.get("test_set")
+    assert r=="a", "Expected 'a' got:#{r}"
   end
 
-  def test_setnx
-    $plugin.setnx()
+  def test_get_non_existent    
+    r=$plugin.get("sarchiapone")
+    assert r==nil, "Expected nil for not-existent key got:#{r}"
   end
 
-  def test_keys
-    $plugin.keys()
+  def test_del_simple    
+    $plugin.set("testx","b")
+    $plugin.del("testx")
+    r=$plugin.get("testx")
+    assert r==nil,  "del is not working. Key was not deleted"
   end
+
+  def test_del_set    
+    $plugin.sadd("test_set","b")
+    $plugin.del("test_set")
+    r=$plugin.get("test_set")
+    assert r==nil,  "del is not working on set(s). Key was not deleted"
+  end
+
+  def test_keys1
+    $plugin.sadd("test_keys1_set","a")
+    $plugin.set("test_keys2","b")
+    keys=$plugin.keys("test_keys2")
+    assert keys.length==1, "Expected one key. Returned keys:#{keys}"
+  end
+
+  def test_keys_star
+    $plugin.sadd("test_keys1_set","a")
+    $plugin.set("test_keys2","b")
+    keys=$plugin.keys("test_keys*")
+    assert keys.length==2, "Pattern matching with * do not works! Expected two keys.  Returned keys:#{keys}"
+  end
+
+
+  def test_keys_and_del
+    keysBefore=$plugin.keys("*")
+    $plugin.set("keys_and_del1","test")
+    $plugin.sadd("keys_and_del2","test")
+    keysAfter=$plugin.keys("*")
+    diff=keysAfter.length-keysBefore.length
+    assert diff==2, "Not all keys returned: #{keysAfter.length} keys but two more expected (exactly two)"
+  end
+
+  def test_add_bad_stuff1
+    $plugin.sadd("trigram:'aa","V")
+    v=$plugin.smembers("trigram:'aa")
+    assert v[0]=="V", " sadd must support very weird string. Got: #{v}"
+  end
+
+  def test_add_bad_stuff2
+    veryBadKey="trigram:'èé'';\"*?£$%&'%&£"
+    $plugin.sadd(veryBadKey,"V2")
+    v=$plugin.smembers(veryBadKey)
+    assert v[0]=="V2", " sadd must support very weird string. Got: #{v}"
+  end
+
+
+  def test_setnx1
+    $plugin.del("nx")
+    $plugin.setnx("nx","b")
+    v=$plugin.get("nx")
+    assert v=="b", "Set Nx does not set"
+  end
+
+
+  def test_setnx2
+    $plugin.set("a","b")
+    $plugin.setnx("a","c")
+    v=$plugin.get("a")
+    assert v=="b"
+  end
+
 
   def test_pipelined
-    $plugin.pipelined()
+    $plugin.pipelined do 
+      $plugin.set("a","?")
+      v=$plugin.get("a")
+      assert v=="?"
+    end
   end
 
   def test_quit
-    $plugin.quit()
+     $plugin.quit()
   end
 
 end

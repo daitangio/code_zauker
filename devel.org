@@ -1,3 +1,7 @@
+* Setup
+* bundle update
+Update packages, download new one
+
 * Future/Study
 To fulfill Google code options:
 ** Google code input
