@@ -2,6 +2,8 @@
 require 'test/unit'
 require 'code_zauker'
 require "code_zauker/sqlite3_plugin"
+require "yaml"
+require "set"
 
 # Setup one-for all...
 testdb="/tmp/code-zauker-test-db.sqlite3"
@@ -166,6 +168,22 @@ class Sqlite3PluginBasicApiTest < Test::Unit::TestCase
     assert v==3, "Key is not set to 3: #{v}"
   end
 
+  def test_simple_set_compression_todo
+    s=Set.new()
+    s.add("'''")
+    s.add('"')
+    s.add(1)
+    s.add(1)
+    s.add(2)
+    # Todo... push compression via sqlite plugin
+    tocompress=s.to_yaml()
+    r=Zlib::Deflate.deflate(tocompress,9)   
+    assert r.length<=tocompress.length, "Deflate size #{r.length} is bigger then #{tocompress.length} original size"
+    comeback=Zlib::Inflate.inflate(r)
+    assert comeback==tocompress, "Decompression do not work"
+    s2=YAML::load(comeback)
+    puts s2.to_yaml()
+  end
 
 end
 
