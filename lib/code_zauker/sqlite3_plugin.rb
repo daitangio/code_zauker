@@ -1,19 +1,20 @@
 # -*- mode:ruby ; -*- -*
 require "code_zauker/version"
+require "rubygems"
+require "sequel"
 require "sqlite3"
+require 'logger'
 
 module CodeZauker
   # basic class which re-implements redis api used by code zauker
   # a plug-in replace for code zauker
   class SQLite3Store
     def initialize(dbpath)
-      @db = SQLite3::Database.new dbpath   
-      
+      ## @db = SQLite3::Database.new dbpath   
+      @db=Sequel.sqlite(dbpath,:loggers => [Logger.new($stdout)])
     end
 
     def connect
-      @setinsert = @db.prepare("insert into unordered_set(name,elem) values ( :k, :v )") 
-      @smembers_query=@db.prepare("select elem from unordered_set where name=:k ")
     end
     def quit
       # @setinsert.close()
@@ -22,6 +23,13 @@ module CodeZauker
     end
 
     def init_db
+      # See also http://sequel.rubyforge.org/rdoc/files/doc/cheat_sheet_rdoc.html
+      @db.create_table :key2value do
+        primary_key :name
+        String :name
+        String :value
+      end
+
       # SQLite does not impose any length restrictions 
       # (other than the large global SQLITE_MAX_LENGTH limit) on the length of strings, BLOBs or numeric values.
       # So lets start
@@ -35,11 +43,6 @@ SQL
 create unique index UX_unordered_set ON unordered_set(name,elem);
 INDEXES
 
-      @db.execute <<-SIMPLE_KEYS
-create table key2value (
-     name text,
-     value text);
-SIMPLE_KEYS
 
       @db.execute <<-INDEXES
 create unique index UX_key2value ON key2value(name);
@@ -48,25 +51,24 @@ INDEXES
       
     end
     
-    def sadd(key,value)
-      begin          
-        @setinsert.execute( :k =>key, :v => value)        
-      rescue SQLite3::ConstraintException => e
-        # ignore SQLite3::ConstraintException: columns name, elem are not unique
-        # used for better perfomance
-        #puts "#{e.message} Code: #{e.code}"
-      end
+    def sadd(key,value)      
+      # insert into unordered_set(name,elem) values ( :k, :v )
+      ds=@db[:unordered_set]
+      if ds.filter(:name=>key, :elem => value).count()==0
+        ds.insert( :name => key, :elem =>value)
+      end      
     end
     def smembers(key)
       r=[]
-      @smembers_query.execute(:k =>key ).each do |row|
-        r.push row[0]
+      # select elem from unordered_set where name=:k 
+      @db[:unordered_set].filter( :name =>key).each do |row|
+        r.push row[:elem]
       end
       return r
     end
 
     def srem(key,elem)
-      @db.query( "delete from unordered_set where name=:k and  elem=:e", :k=>key, :e=>elem )
+      @db[:unordered_set].filter(:name => key, :elem => elem).delete();
     end
 
     # Returns the members of the set resulting from the intersection of all the given sets.
@@ -84,22 +86,22 @@ INDEXES
         sqls.push "select elem from unordered_set where name='#{k}'"
       end
       r=[]
-      @db.execute( sqls.join(" INTERSECT ")  ) do |row|
-        r.push row[0]
+      @db.fetch( sqls.join(" INTERSECT ")  ) do |row|
+        r.push row[:elem]
       end
       return r
     end
     def scard(key)
-      # return first elemenents of first row
-      return @db.execute( "select count(*) from unordered_set where name='#{key}'")[0][0]
+      return @db[:unordered_set].filter(:name =>key).count()
     end
     # Set key to hold the string value. 
     # If key already holds a value, it is overwritten, regardless of its type
     def set(key,value)
+      ds=@db[:key2value]
       # Ensure it does not exist...
-      @db.execute "delete from key2value where name=?",key
-      # push!
-      @db.execute "insert into key2value(name,value) values ( ?, ? )",[key,value]
+      ds.filter(:name => key).delete()
+      ds.insert(:name=>key, :value=>value)
+
     end
 
     #Set key to hold string value if key does not exist. In that case, it is equal to SET.
@@ -112,9 +114,9 @@ INDEXES
     # Get the value of key. If the key does not exist the special value nil is returned. 
     # only strings are supported
     def get(key)
-      rs=@db.execute "select value from key2value where name=?",key
-      if rs[0]!=nil
-        return rs[0][0]
+      elems=@db[:key2value].filter(:name=>key).all      
+      if elems.length!=0
+        return elems[0][:value]
       else
         return nil
       end
@@ -124,23 +126,27 @@ INDEXES
     # Work on any key
     # Slow: it should figure when the key is...
     def del(*keys)
+      dso=@db[:unordered_set]
+      dsk=@db[:key2value]
       keys.each do |k|
-        @db.execute "delete from unordered_set  where name=?",k
-        @db.execute "delete from key2value      where name=?",k
+        dso.filter(:name =>k).delete()
+        dsk.filter(:name =>k).delete()
       end
     end
 
     def pipelined(options={})
-      begin
-        #puts "Pipeline..."
-        @db.transaction()
-        yield
-        #puts "...Pipeline Ended. Committing..."
-        @db.commit()
-      rescue SQLite3::SQLException =>e        
-        puts "FATAL. Rollbacking and re-raising..."
-        @db.rollback()
-        raise e
+      #puts "Pipeline..."
+      # Sequel manage rollback magically.
+      # See http://sequel.rubyforge.org/rdoc/files/doc/cheat_sheet_rdoc.html
+      # on Transaction paragprah
+      @db.transaction do
+        begin          
+          yield
+          #puts "...Pipeline Ended. Committing..."
+        rescue SQLite3::SQLException =>e        
+          puts "FATAL. Rollbacking and re-raising..."
+          raise e
+        end
       end
     end
 
@@ -165,18 +171,16 @@ INDEXES
       r=[]      
       if pattern =="*"
         #puts "FULL UNION"
-        @db.execute( 
-          "select distinct name from key2value union select distinct name from unordered_set")  do |row|
-          #puts row[0]
-          r.push row[0]
+        @db.fetch("select distinct name from key2value union select distinct name from unordered_set")  do |row|
+          r.push row[:name]
         end
       else
         sqlPattern=pattern.sub("*","%") 
         # use push(*keys to expand push
-        @db.execute( 
+        @db.fetch( 
           "select name from key2value where name like ? union select name from unordered_set where name like ?",
-                    [sqlPattern, sqlPattern])  do |row|
-          r.push row[0]
+                    sqlPattern, sqlPattern)  do |row|
+          r.push row[:name]
         end
       end
       return r
