@@ -4,6 +4,8 @@ require "rubygems"
 require "sequel"
 require "sqlite3"
 require 'logger'
+require "set"
+require "zlib"
 
 module CodeZauker
   # basic class which re-implements redis api used by code zauker
@@ -19,7 +21,7 @@ module CodeZauker
     def quit
       # @setinsert.close()
       # @smembers_query.close()
-      # @db.close()
+OME/      # @db.close()
     end
 
     def init_db
@@ -50,25 +52,44 @@ INDEXES
 
       
     end
-    
-    def sadd(key,value)      
-      # insert into unordered_set(name,elem) values ( :k, :v )
-      ds=@db[:unordered_set]
-      if ds.filter(:name=>key, :elem => value).count()==0
-        ds.insert( :name => key, :elem =>value)
-      end      
-    end
-    def smembers(key)
-      r=[]
-      # select elem from unordered_set where name=:k 
-      @db[:unordered_set].filter( :name =>key).each do |row|
-        r.push row[:elem]
+
+    #Private accessor
+    def getSet(key)
+      toDecompress=self.get(key+"_compressedSet")
+      if toDecompress==nil
+        return Set.new()
+      else
+        comeback=Zlib::Inflate.inflate(toDecompress)
+        s=YAML::load(comeback)
+        return s
       end
-      return r
+    end
+
+    def putSet(key,s)
+      tocompress=s.to_yaml()
+      compressed=Zlib::Deflate.deflate(tocompress,9)  
+      self.put(key+"_compressedSet",compressed)
+    end
+
+    
+
+    def sadd(key,value)     
+      s=self.getSet(key)
+      s.add(value)
+      self.putSet(key,s)
+    end
+
+    def smembers(key)
+      s=self.getSet(key)
+      return s
     end
 
     def srem(key,elem)
-      @db[:unordered_set].filter(:name => key, :elem => elem).delete();
+      # Deflate and re-store
+      s=self.getSet(key)
+      s.delete(elem)
+      self.putSet(key,s)
+      return s
     end
 
     # Returns the members of the set resulting from the intersection of all the given sets.

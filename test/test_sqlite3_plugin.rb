@@ -168,6 +168,17 @@ class Sqlite3PluginBasicApiTest < Test::Unit::TestCase
     assert v==3, "Key is not set to 3: #{v}"
   end
 
+  def test_interesection
+    s1=Set.new()
+    s1.add(1)
+    s1.add(2)
+    s2=Set.new()
+    s2.add(2)
+    si=s1.intersection(s2)
+    assert si.length==1 , "Interesct doesn't work: #{si}"
+    assert si.member?(2)==true, "Interesct doesn't work: #{si}"
+  end
+
   def test_simple_set_compression_todo
     s=Set.new()
     s.add("'''")
