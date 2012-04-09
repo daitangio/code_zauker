@@ -1,22 +1,73 @@
-<html>
-<head>
-<title> CodeZauker v<%= CodeZauker::VERSION %> </title>
-</head>
-<body>
-  <div align="center">
-    <div align="left" style="background:url(/CodeZauker.gif) no-repeat; width:489; height:110;" title="CodeZauker">
-      &nbsp;
-    </div>  
-    <form method="get" action="/search">
-      <input type="text" name="q" />
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title> CodeZauker v<%= CodeZauker::VERSION %> </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/bootstrap-responsive.css" rel="stylesheet">
+  </head>
+  <body>
 
-<style>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Code Zauker</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="active"><a href="#">Home</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
 
-</style>
-<div class="jsb" style="padding-top:2px"> <center>  <input value="Search" name="btnK" type="submit" ></center> </div>      
-    </form>
-  </div>
-</body>
+    <div class="container">
+      <div class="hero-unit">
+
+	<div class="thumbnail">
+	  <!--  width:489; height:110; -->
+	  <img src="/CodeZauker.gif" alt="CodeZauker">
+	  <h5><%= CodeZauker::VERSION %></h5>	  
+	</div>
+	<form method="get" action="/search" class="well form-search">
+	  <p class="span8 offset2">
+	  <input type="text" name="q" class=" search-query " />	  
+	  </p>
+	  <!-- span class="help-inline">Input must be at least 3-letter long</span-->
+	  <p class="span4 offset4">
+	    <input class="btn btn-primary btn-large" value="Search" name="btnK" type="submit" /> 
+	    <br />
+	  </p>
+	</form>
+      </div>
+
+
+      <div class="row">
+      </div>
+    </div>
+    <!-- Le javascript
+	 ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery.js"></script>
+    <script src="/js/bootstrap-transition.js"></script>
+    <script src="/js/bootstrap-alert.js"></script>
+    <script src="/js/bootstrap-modal.js"></script>
+    <script src="/js/bootstrap-dropdown.js"></script>
+    <script src="/js/bootstrap-scrollspy.js"></script>
+    <script src="/js/bootstrap-tab.js"></script>
+    <script src="/js/bootstrap-tooltip.js"></script>
+    <script src="/js/bootstrap-popover.js"></script>
+    <script src="/js/bootstrap-button.js"></script>
+    <script src="/js/bootstrap-collapse.js"></script>
+    <script src="/js/bootstrap-carousel.js"></script>
+    <script src="/js/bootstrap-typeahead.js"></script>
+  </body>
 
 </html>
 
