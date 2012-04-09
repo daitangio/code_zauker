@@ -44,6 +44,11 @@ optparse= OptionParser.new do  |opts|
   end
 
 
+  opts.on('-h','--redis-server SERVER', String,
+          'Specify the alternate redis server to use')do |server|
+    raise 'Still to be done'
+  end
+
 
 
   opts.on( '-h', '--help', 'Display this screen' ) do

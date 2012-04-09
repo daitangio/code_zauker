@@ -1,25 +1,67 @@
-<html>
-<head>
-<title> CodeZauker v<%= CodeZauker::VERSION %> Results on <%= q %></title>
-</head>
-<body>
-<h2>Search term:
- <form method="get" action="/search">
-      <input type="text" name="q"  value="<%=q%>" />
- </form>
-</h2>
-<br/>
-<h2> Search Results: <%=files.length%></h2>
-<ol>
-<%
- files.each do |f|
-%>
-<li><%=f%>
-<%   
- end
-%>
-</ol>
-</body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title> CodeZauker v<%= CodeZauker::VERSION %> Results on <%= q %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/bootstrap-responsive.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+	<h2>Search term:</h2>
+        <p class="span8 offset2">
+	  <form method="get" action="/search">
+	    <input type="text" name="q"  value="<%=q%>" />
+<!-- DOES NOT WORK YET
+	    <ul class="nav">
+	      <li class="dropdown">
+		<a href="#"
+		   class="dropdown-toggle"
+		   data-toggle="dropdown">
+		  Account
+		  <b class="caret"></b>
+		</a>
+		<ul class="dropdown-menu">
+		  ...
+		</ul>
+	      </li>
+	    </ul>
+-->
+
+	  </form>
+	</p>
+	<span class="badge badge-success"> <%=files.length%> Results</span>
+	<ol>
+	  <%
+	     files.each do |f|
+	     %>
+	  <li><%=f%>
+	    <%   
+	       end
+	       %>
+	</ol>
+      </div>
+    </div>
+    <!-- Le javascript
+	 ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery.js"></script>
+    <script src="/js/bootstrap-transition.js"></script>
+    <script src="/js/bootstrap-alert.js"></script>
+    <script src="/js/bootstrap-modal.js"></script>
+    <script src="/js/bootstrap-dropdown.js"></script>
+    <script src="/js/bootstrap-scrollspy.js"></script>
+    <script src="/js/bootstrap-tab.js"></script>
+    <script src="/js/bootstrap-tooltip.js"></script>
+    <script src="/js/bootstrap-popover.js"></script>
+    <script src="/js/bootstrap-button.js"></script>
+    <script src="/js/bootstrap-collapse.js"></script>
+    <script src="/js/bootstrap-carousel.js"></script>
+    <script src="/js/bootstrap-typeahead.js"></script>
+
+  </body>
 
 </html>
 

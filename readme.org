@@ -15,15 +15,15 @@ For a sample redis configuration see the etc/ directory of the project
 
 
 * Release History
-  | Version | Date        | Summary                                              |
-  |---------+-------------+------------------------------------------------------|
-  |   0.0.5 |             | Added Sinatra-based web search page                  |
-  |   0.0.4 | 12 Feb 2012 | PDF Searching                                        |
-  |   0.0.3 | 03 Feb 2012 | Added Case insensitive search.UTF-8 trigram database |
-  |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.       |
-  |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only)    |
-  |         |             |                                                      |
-  |         |             |                                                      |
+  | Version | Date        | Summary                                                       |
+  |---------+-------------+---------------------------------------------------------------|
+  |   0.0.5 | 09 Apr 2012 | Added Sinatra-based web search page, featuring bootrstrap css |
+  |   0.0.4 | 12 Feb 2012 | PDF Searching                                                 |
+  |   0.0.3 | 03 Feb 2012 | Added Case insensitive search.UTF-8 trigram database          |
+  |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.                |
+  |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only)             |
+  |         |             |                                                               |
+  |         |             |                                                               |
 
 
 * DEVELOPING
