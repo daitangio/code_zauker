@@ -4,6 +4,9 @@
 $VERBOSE=nil 
 require 'code_zauker'
 require 'code_zauker/grep'
+require 'code_zauker/cli'
+require 'redis/connection/hiredis'
+require 'redis'
 require 'tempfile'
 require 'pdf/reader'
 include Grep
@@ -17,6 +20,9 @@ optparse= OptionParser.new do  |opts|
   options[:postcontext]=0
   options[:extensions_to_ignore]=[]
   options[:file_to_exclude]=[]
+  options[:redis_host]="127.0.0.1"
+  options[:redis_port]=6379
+  options[:redis_password]=nil
 
   opts.on('-i', '--ignore-case','ignore case distinctions') do 
       options[:ignorecase]=true    
@@ -44,9 +50,18 @@ optparse= OptionParser.new do  |opts|
   end
 
 
-  opts.on('-h','--redis-server SERVER', String,
+  opts.on('-h','--redis-server pass@SERVER:port', String,
           'Specify the alternate redis server to use')do |server|
-    raise 'Still to be done'
+    myoptions=CodeZauker::CliUtil.new().parse_host_options(server)
+    options[:redis_host]=myoptions[:redis_host]
+    options[:redis_port]=myoptions[:redis_port]
+    options[:redis_password]=myoptions[:redis_password]
+    
+    if options[:redis_password]
+      puts "Server: #{options[:redis_host]} Port:#{options[:redis_port]} WithPassword"
+    else
+      puts "Server: #{options[:redis_host]} Port:#{options[:redis_port]}"
+    end
   end
 
 
@@ -69,7 +84,8 @@ optparse.parse!
 ARGV.each do | s |
   #puts "Code Zauker Searching for #{s}"  
   util=CodeZauker::Util.new()
-  fs=CodeZauker::FileScanner.new()
+  redisConnection=Redis.new(:host => options[:redis_host], :port => options[:redis_port], :password=> options[:redis_password])
+  fs=CodeZauker::FileScanner.new(redisConnection)
   if options[:ignorecase]==false
     files=fs.search(s)
     pattern=/#{Regexp.escape(s)}/

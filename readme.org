@@ -1,6 +1,6 @@
 * Code Zauker: your code, indexed
 Code Zauker is a search engine for programming languages.
-Code Zauker is based from ideas taken by old Google Code Search and uses Redis as a basic platform
+Code Zauker is based from ideas taken by old Google Code Search and uses Redis as storage engine.
 
 For news and discussion: http://gioorgi.com/tag/code-zauker/
 
@@ -13,10 +13,15 @@ To install Code Zauker,simply issue
 You need also [[http://redis.io/][redis-2.4.6]] or better. 
 For a sample redis configuration see the etc/ directory of the project
 
+* Try it out
+Take a look to czindex and czsearch commands help for usage patterns.
+
+
 
 * Release History
   | Version | Date        | Summary                                                       |
   |---------+-------------+---------------------------------------------------------------|
+  |   0.0.6 |             | Implemente host option. Better web search. Wildcards (*) search |
   |   0.0.5 | 09 Apr 2012 | Added Sinatra-based web search page, featuring bootrstrap css |
   |   0.0.4 | 12 Feb 2012 | PDF Searching                                                 |
   |   0.0.3 | 03 Feb 2012 | Added Case insensitive search.UTF-8 trigram database          |
@@ -25,7 +30,7 @@ For a sample redis configuration see the etc/ directory of the project
   |         |             |                                                               |
   |         |             |                                                               |
 
-
+  
 * DEVELOPING
 For developing with Code Zauker you need bundler 1.0.21 or above
 See devel.org file
