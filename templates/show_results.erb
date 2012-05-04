@@ -32,15 +32,20 @@
 
 	  </form>
 	</p>
+	<style>
+	  b{
+	   color: #A1A100;
+	  }
+	</style>
 	<span class="badge badge-success"> <%=files.length%> Results</span>
 	<ol>
 	  <%
 	     files.each do |f|
-	     %>
+	  %>
 	  <li><%=f%>
-	    <%   
+	  <%   
 	       end
-	       %>
+	  %>
 	</ol>
       </div>
     </div>
