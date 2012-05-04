@@ -2,11 +2,18 @@
 # Suggested execution is mixing find / xargs with the parallel (P) parameters:
 # find test/fixture/ -type f | xargs -P 5  -n 10 ./bin/czindexer
 # will fire 5 czindexer each with 10 files to process...
+require 'code_zauker/cli'
+require 'redis/connection/hiredis'
+require 'redis'
 require 'optparse'
 options={}
 optparse= OptionParser.new do  |opts|
   opts.banner="Usage: czindexer [options] [file1] [file2]..."
   options[:verbose] = false
+  options[:redis_host]="127.0.0.1"
+  options[:redis_port]=6379
+  options[:redis_password]=nil
+
 
   opts.on( '-v', '--verbose', 'Output more information' ) do
     options[:verbose] = true
@@ -15,6 +22,20 @@ optparse= OptionParser.new do  |opts|
   options[:reindex]=false
   opts.on( '-f', '--force-reindex', 'Force Reindex (default:false)') do
     options[:reindex]=true
+  end
+
+  opts.on('-h','--redis-server pass@SERVER:port', String,
+          'Specify the alternate redis server to use')do |server|
+    myoptions=CodeZauker::CliUtil.new().parse_host_options(server)
+    options[:redis_host]=myoptions[:redis_host]
+    options[:redis_port]=myoptions[:redis_port]
+    options[:redis_password]=myoptions[:redis_password]
+    
+    if options[:redis_password]
+      puts "Server: #{options[:redis_host]} Port:#{options[:redis_port]} WithPassword"
+    else
+      puts "Server: #{options[:redis_host]} Port:#{options[:redis_port]}"
+    end
   end
 
   opts.on( '-h', '--help', 'Display this screen' ) do
@@ -82,7 +103,8 @@ end
 begin  
   $CUMULATED_TIME=0
   # Allocated here to recycle connection
-  fs=CodeZauker::FileScanner.new()
+  redisConnection=Redis.new(:host => options[:redis_host], :port => options[:redis_port], :password=> options[:redis_password])
+  fs=CodeZauker::FileScanner.new(redisConnection)
   $PROCESSED_FILES=0
   puts "Code Zauker v#{CodeZauker::VERSION}" if  options[:verbose]
   puts "Reindexing..." if options[:verbose]==true and options[:reindex]==true
