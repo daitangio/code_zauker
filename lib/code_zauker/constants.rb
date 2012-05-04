@@ -1,5 +1,7 @@
 module CodeZauker
-  MAX_PUSH_TRIGRAM_RETRIES=3
+  # Under Amazon AWS, a lot of timeout can happen.
+  # We put a higer retry here
+  MAX_PUSH_TRIGRAM_RETRIES=15
   # Stats 
   # It is difficult to decide what is the best trigram push size.
   # a larger one ensure a best in memory processing but can lead to longer transactions

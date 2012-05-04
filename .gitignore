@@ -5,3 +5,4 @@ pkg/*
 code_zauker_index.rdb
 .yardoc
 publishMe
+bin/aws*

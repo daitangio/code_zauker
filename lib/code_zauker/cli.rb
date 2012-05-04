@@ -8,9 +8,9 @@ module CodeZauker
       options[:redis_host]="127.0.0.1"
       options[:redis_port]=6379
       options[:redis_password]=nil
-      r=/(\w+)@([a-zA-Z0-9]+):([0-9]+)?/
-      rNoPass=/([a-zA-Z0-9]+):([0-9]+)?/
-      rHostAndPass=/(\w+)@([a-zA-Z0-9]+)/
+      r=/(\w+)@([a-zA-Z0-9.]+):([0-9]+)?/
+      rNoPass=/([a-zA-Z0-9.]+):([0-9]+)?/
+      rHostAndPass=/(\w+)@([a-zA-Z0-9.]+)/
       m=r.match(connection_string)    
       if m                   
         options[:redis_password]=m.captures[0]
