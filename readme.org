@@ -21,6 +21,7 @@ Take a look to czindex and czsearch commands help for usage patterns.
 * Release History
   | Version | Date        | Summary                                                         |
   |---------+-------------+-----------------------------------------------------------------|
+  |   0.0.7 |             | 
   |   0.0.6 | 04 May 2012 | New redis-server option. Better web search with results hilight |
   |   0.0.5 | 09 Apr 2012 | Added Sinatra-based web search page, featuring bootrstrap css   |
   |   0.0.4 | 12 Feb 2012 | PDF Searching                                                   |

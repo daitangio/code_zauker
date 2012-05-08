@@ -24,7 +24,8 @@ get '/search' do
       pattern=/#{Regexp.escape(askedQuery)}/i
       lines=grep(f,pattern, pre_context=2, post_context=2);
       desc=""
-      lines.each do |l |
+      lines.each do | l |
+        # http://stackoverflow.com/questions/1287630/ruby-gsub-and-regex
         hilighted=l.gsub(/(#{Regexp.escape(askedQuery)})/i){ "<b>#{$1}</b>"}
         desc=desc+ "#{f}:#{hilighted}\n"
       end

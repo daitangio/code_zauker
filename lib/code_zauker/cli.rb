@@ -36,5 +36,28 @@ module CodeZauker
       end
       return options
     end
+
+    def do_report(redis)
+      puts "Simple Reporting....on #{redis.client.host}"
+      id2filename=redis.keys "fscan:id2filename:*"
+      puts "File Stored:\t\t#{id2filename.length}"
+      processedFiles=redis.scard("fscan:processedFiles")
+      puts "Processed Files:\t#{processedFiles}"
+      # Complex... compute average "fscan:trigramsOnFile:#{fid}"
+      sum=0.0
+      fileName2Ids=redis.keys "fscan:id:*"
+      count=fileName2Ids.length+0.0
+      puts "File ids:#{count}"   
+      #ids=redis.mget (*(fileName2Ids))
+      fileName2Ids.each do | filename |
+        # Forma fscan:trigramsOnFile:5503
+        fid=redis.get filename
+        trigramsOnFile=redis.scard("fscan:trigramsOnFile:#{fid}")
+        sum = sum + trigramsOnFile
+        puts "#{filename} fscan:trigramsOnFile:#{fid} -> #{trigramsOnFile} "
+      end
+      av=sum/count
+      puts "Average Trigrams per file:#{av}"
+    end
   end
 end
