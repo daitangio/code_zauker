@@ -45,19 +45,25 @@ module CodeZauker
       puts "Processed Files:\t#{processedFiles}"
       # Complex... compute average "fscan:trigramsOnFile:#{fid}"
       sum=0.0
+      max=0
+      min=90000000000000000
       fileName2Ids=redis.keys "fscan:id:*"
       count=fileName2Ids.length+0.0
       puts "File ids:#{count}"   
-      #ids=redis.mget (*(fileName2Ids))
-      fileName2Ids.each do | filename |
+      ids=redis.mget(*(redis.keys("fscan:id:*")))
+      ids.each do | fid |
         # Forma fscan:trigramsOnFile:5503
-        fid=redis.get filename
         trigramsOnFile=redis.scard("fscan:trigramsOnFile:#{fid}")
         sum = sum + trigramsOnFile
-        puts "#{filename} fscan:trigramsOnFile:#{fid} -> #{trigramsOnFile} "
+        if trigramsOnFile == 0 or trigramsOnFile >=max
+          fname=redis.get("fscan:id2filename:#{fid}")
+          puts "Note fscan:trigramsOnFile:#{fid} -> #{trigramsOnFile} #{fname}"
+        end
+        max=trigramsOnFile if trigramsOnFile >max
+        min=trigramsOnFile if trigramsOnFile <min and trigramsOnFile>0
       end
       av=sum/count
-      puts "Average Trigrams per file:#{av}"
+      puts "Average Trigrams per file:#{av} Min: #{min} Max: #{max}"
     end
   end
 end

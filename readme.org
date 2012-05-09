@@ -14,14 +14,46 @@ You need also [[http://redis.io/][redis-2.4.6]] or better.
 For a sample redis configuration see the etc/ directory of the project
 
 * Try it out
-Take a look to czindex and czsearch commands help for usage patterns.
+** To index all your files
+The following command will index all the code file below /full_path_of_sources/ providing 
+a feedback on standard output
+#+BEGIN_SRC sh
+ czindexer -v /full_path_of_sources/
+#+END_SRC
+If your redis server is on another machine, you can use the following command
+#+BEGIN_SRC sh
+ czindexer --redis-server myredisserver  -v /full_path_of_sources/
+#+END_SRC
+Also authentication over redis is supported:
+#+BEGIN_SRC sh
+ czindexer --redis-server password@rediserverpwp  -v /full_path_of_sources/
+#+END_SRC
 
+
+To search for the 'my_beautiful_method' try out:
+#+BEGIN_SRC sh
+ czsearch  my_beautiful_method
+#+END_SRC
+
+Looking case insensitive can be userful too....
+#+BEGIN_SRC sh
+ czsearch -i  'Select USER_id'
+#+END_SRC
+
+Tip:Take a look to czindex and czsearch commands help for full options list
+
+
+** Parallel execution
+If you want to speed up indexing, you can use the mczindexer command.
+For instance:
+mczindexer eclipse-sources/
+will fire at most 10 parallel czindexer.
 
 
 * Release History
   | Version | Date        | Summary                                                         |
   |---------+-------------+-----------------------------------------------------------------|
-  |   0.0.7 |             | 
+  |   0.0.7 |             | Better documentation, mczindexer, report command
   |   0.0.6 | 04 May 2012 | New redis-server option. Better web search with results hilight |
   |   0.0.5 | 09 Apr 2012 | Added Sinatra-based web search page, featuring bootrstrap css   |
   |   0.0.4 | 12 Feb 2012 | PDF Searching                                                   |

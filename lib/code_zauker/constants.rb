@@ -10,9 +10,11 @@ module CodeZauker
   DEFAULT_EXCLUDED_EXTENSION=[
                               # Documents                             
                               ".xps",
-                              ".zip",".7z",
+                              ".zip",".7z","rar",
                               # MS Office zip-like files...
                               ".pptx",".docx",".xlsx",
+                              # Avoid slurping text document too...
+                              ".doc",
                               ".ppt",".xls",".rtf",".vsd", ".odf",
                               # Binary bad stuff
                               ".dll",".exe",".out",".elf",".lib",".so",
@@ -25,7 +27,9 @@ module CodeZauker
                               ".tar",
                               ".gz",".Z",
                               ".dropbox",
-                              ".svn-base",".pdb",".cache",                             
+                              ".svn-base",".pdb",".cache", 
+                              #IDE STUFF
+                              ".wlwLock",
                               # Music exclusion
                               ".mp3",".mp4",".wav",
                               # Image exclusion
