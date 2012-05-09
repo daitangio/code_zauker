@@ -1,0 +1,4 @@
+#!/bin/bash
+set -x -e
+echo "Parallel Indexer"
+time find $* -type f -print0 | xargs -0 -P 10  -n 25  czindexer  -v
