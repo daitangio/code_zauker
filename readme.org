@@ -52,7 +52,9 @@ It is still beta, but it is *very* fast, thank to redis!
 ** Parallel execution
 If you want to speed up indexing, you can use the mczindexer command.
 For instance:
+#+BEGIN_SRC sh
 mczindexer eclipse-sources/
+#+END_SRC
 will fire at most 10 parallel czindexer.
 
 ** Simple stats
@@ -67,7 +69,8 @@ and enjoy!
 * Release History
   | Version | Date        | Summary                                                         |
   |---------+-------------+-----------------------------------------------------------------|
-  |   0.0.7 | 13 May 2012 | Better documentation, mczindexer, new report command
+  |   0.0.8 |             | Wildcard (*) search                                             |
+  |   0.0.7 | 13 May 2012 | Better documentation, mczindexer, new report command            |
   |   0.0.6 | 04 May 2012 | New redis-server option. Better web search with results hilight |
   |   0.0.5 | 09 Apr 2012 | Added Sinatra-based web search page, featuring bootrstrap css   |
   |   0.0.4 | 12 Feb 2012 | PDF Searching                                                   |
