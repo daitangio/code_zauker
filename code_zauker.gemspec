@@ -27,6 +27,9 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "redis", "~> 2.2"
   s.add_runtime_dependency "pdf-reader", "~> 1.0.0"
   s.add_runtime_dependency "sinatra", "~> 1.3"
+  s.add_runtime_dependency "redis_logger", "~> 0.1"
+  # Eval http://github.com/masonoise/redis_logger-web  
+
   # thin unable to be installed for missing g++ on my dev platform (shame on debian)
   #s.add_runtime_dependency "thin"
   ## Install and require the hiredis gem before redis-rb for maximum performances.

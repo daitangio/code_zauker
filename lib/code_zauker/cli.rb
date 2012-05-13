@@ -49,21 +49,34 @@ module CodeZauker
       min=90000000000000000
       fileName2Ids=redis.keys "fscan:id:*"
       count=fileName2Ids.length+0.0
-      puts "File ids:#{count}"   
+      puts "Finding ids..."   
       ids=redis.mget(*(redis.keys("fscan:id:*")))
+      puts "Scanning ids..."      
       ids.each do | fid |
         # Forma fscan:trigramsOnFile:5503
         trigramsOnFile=redis.scard("fscan:trigramsOnFile:#{fid}")
         sum = sum + trigramsOnFile
-        if trigramsOnFile == 0 or trigramsOnFile >=max
-          fname=redis.get("fscan:id2filename:#{fid}")
-          puts "Note fscan:trigramsOnFile:#{fid} -> #{trigramsOnFile} #{fname}"
-        end
+        # if trigramsOnFile == 0 or trigramsOnFile >=max
+        #   fname=redis.get("fscan:id2filename:#{fid}")
+        #   puts "Note fscan:trigramsOnFile:#{fid} -> #{trigramsOnFile} #{fname}"
+        # end
         max=trigramsOnFile if trigramsOnFile >max
-        min=trigramsOnFile if trigramsOnFile <min and trigramsOnFile>0
+        min=trigramsOnFile if trigramsOnFile <min and trigramsOnFile>0        
       end
       av=sum/count
       puts "Average Trigrams per file:#{av} Min: #{min} Max: #{max}"
+      tagCharSize=max/80
+      #tagCharSize=max/10 if tagCharSize>80
+      puts "Graphic summary... +=#{tagCharSize}"
+      ids.each do | fid |
+        trigramsOnFile=redis.scard("fscan:trigramsOnFile:#{fid}")
+        if trigramsOnFile>= (tagCharSize*3)
+          fname=redis.get("fscan:id2filename:#{fid}")
+          bar="+"*(trigramsOnFile/tagCharSize)
+          puts "#{bar} #{fname}"
+        end
+      end
+
     end
   end
 end

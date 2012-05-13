@@ -41,6 +41,12 @@ Looking case insensitive can be userful too....
 #+END_SRC
 
 Tip:Take a look to czindex and czsearch commands help for full options list
+** Web interface
+There is a new shiny web interface based on sinatra. To try it out, fire
+#+BEGIN_SRC sh
+ ./bin/webgui
+#+END_SRC
+It is still beta, but it is *very* fast, thank to redis!
 
 
 ** Parallel execution
@@ -49,11 +55,19 @@ For instance:
 mczindexer eclipse-sources/
 will fire at most 10 parallel czindexer.
 
+** Simple stats
+You can ask code zauker to print a nice stats on standard output.
+Run
+#+BEGIN_SRC sh
+ ./bin/report.rb
+#+END_SRC
+and enjoy!
+
 
 * Release History
   | Version | Date        | Summary                                                         |
   |---------+-------------+-----------------------------------------------------------------|
-  |   0.0.7 |             | Better documentation, mczindexer, report command
+  |   0.0.7 | 13 May 2012 | Better documentation, mczindexer, new report command
   |   0.0.6 | 04 May 2012 | New redis-server option. Better web search with results hilight |
   |   0.0.5 | 09 Apr 2012 | Added Sinatra-based web search page, featuring bootrstrap css   |
   |   0.0.4 | 12 Feb 2012 | PDF Searching                                                   |
