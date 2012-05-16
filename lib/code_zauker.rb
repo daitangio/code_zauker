@@ -160,7 +160,12 @@ module CodeZauker
 
     
     def disconnect()    
-      @redis.quit
+      begin
+        @redis.quit
+      rescue Errno::EAGAIN =>e
+        # Nothing to do...
+        puts "Ignored EAGAIN ERROR during disconnect..."
+      end
     end
 
 
@@ -292,7 +297,7 @@ module CodeZauker
       trigramInAnd=Set.new()
       # Search=> Sea AND ear AND arc AND rch
       for j in 0...term.length
-        currentTrigram=term[j,GRAM_SIZE]        
+        currentTrigram=term[j,GRAM_SIZE]
         if currentTrigram.length <GRAM_SIZE
           # We are at the end...
           break
@@ -328,6 +333,37 @@ module CodeZauker
       end      
       fileIds=    @redis.sinter(*trigramInAnd)
       return map_ids_to_files(fileIds)      
+    end
+
+    # = wild cards search
+    # You can search trigram in the form
+    # public*class*Apple
+    # will match java declaration of MyApple  but not
+    # YourAppManager
+    def wsearch(term,case_sensitive=true)
+      # Split stuff
+      puts "Wild Search request:#{term}"
+      m=term.split("*")
+      if m.length>0
+        trigramInAnd=Set.new()
+        puts "*= Found:#{m.length}"
+        m.each do | wt |
+          puts "Splitting  #{wt}"
+          trigSet=split_in_trigrams(wt,"trigram")
+          trigramInAnd=trigramInAnd.merge(trigSet)
+        end
+        puts "Trigrams: #{trigramInAnd.length}"
+        if trigramInAnd.length==0
+          return []
+        end      
+        fileIds=    @redis.sinter(*trigramInAnd)
+        fileNames=map_ids_to_files(fileIds)
+        puts "DEBUG #{fileIds} #{fileNames}"
+        return fileNames     
+      else
+        puts "Warn no Wild!"
+        return search(term)
+      end
     end
 
 

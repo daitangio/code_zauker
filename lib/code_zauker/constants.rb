@@ -13,6 +13,12 @@ module CodeZauker
                               ".zip",".7z","rar",
                               # MS Office zip-like files...
                               ".pptx",".docx",".xlsx",
+                              # MS Visual Studio big bad files"
+                              ".scc",".datasource",".pdb","vspscc",".settings",
+                              #"Telerik.Web.UI.xml",
+                              ".Web.UI.xml",
+                              # Auto-generated stuff...is suggested to be avoided
+                              ".designer.cs",
                               # Avoid slurping text document too...
                               ".doc",
                               ".ppt",".xls",".rtf",".vsd", ".odf",
@@ -27,7 +33,7 @@ module CodeZauker
                               ".tar",
                               ".gz",".Z",
                               ".dropbox",
-                              ".svn-base",".pdb",".cache", 
+                              ".svn-base",".cache", 
                               #IDE STUFF
                               ".wlwLock",
                               # Music exclusion
