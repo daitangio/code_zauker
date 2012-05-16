@@ -1,6 +1,7 @@
 # -*- mode:ruby ; -*- -*
 require "code_zauker/version"
 require "code_zauker/constants"
+require 'code_zauker/grep'
 require 'redis/connection/hiredis'
 require 'redis'
 require 'set'
@@ -340,25 +341,29 @@ module CodeZauker
     # public*class*Apple
     # will match java declaration of MyApple  but not
     # YourAppManager
-    def wsearch(term,case_sensitive=true)
+    def wsearch(term)
       # Split stuff
       puts "Wild Search request:#{term}"
       m=term.split("*")
       if m.length>0
         trigramInAnd=Set.new()
         puts "*= Found:#{m.length}"
-        m.each do | wt |
-          puts "Splitting  #{wt}"
-          trigSet=split_in_trigrams(wt,"trigram")
+        m.each do | wtc |
+          wt=wtc.downcase()
+          #puts "Splitting  #{wt}"
+          trigSet=split_in_trigrams(wt,"trigram:ci")
           trigramInAnd=trigramInAnd.merge(trigSet)
         end
-        puts "Trigrams: #{trigramInAnd.length}"
+        # puts "Trigrams: #{trigramInAnd.length}"
+        # trigramInAnd.each do | x |
+        #   puts "#{x}"
+        # end
         if trigramInAnd.length==0
           return []
         end      
-        fileIds=    @redis.sinter(*trigramInAnd)
+        fileIds=@redis.sinter(*trigramInAnd)
         fileNames=map_ids_to_files(fileIds)
-        puts "DEBUG #{fileIds} #{fileNames}"
+        #puts "DEBUG #{fileIds} #{fileNames}"
         return fileNames     
       else
         puts "Warn no Wild!"

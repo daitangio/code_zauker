@@ -14,7 +14,7 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     files=fs.wsearch("Wild*West")
     assert(files.include?("./test/fixture/wildtest.txt")== true, 
            "Expected file not found. Files found:#{files}")
-    assert(files.length==1)
+    
   end
 
   def test_foolish_wild2
@@ -22,8 +22,7 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     fs.load("./test/fixture/wildtest.txt")
     files=fs.wsearch("Wild*West*Movie")
     assert(files.include?("./test/fixture/wildtest.txt")== true, 
-           "Expected file not found. Files found:#{files}")
-    assert(files.length==1)
+           "Expected file not found. Files found:#{files}")    
   end
 
   # Also unordered match will work

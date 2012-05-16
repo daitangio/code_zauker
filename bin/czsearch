@@ -23,6 +23,7 @@ optparse= OptionParser.new do  |opts|
   options[:redis_host]="127.0.0.1"
   options[:redis_port]=6379
   options[:redis_password]=nil
+  options[:be_wild]=false
 
   opts.on('-i', '--ignore-case','ignore case distinctions') do 
       options[:ignorecase]=true    
@@ -41,12 +42,16 @@ optparse= OptionParser.new do  |opts|
       options[:precontext]=options[:postcontext]
     end
   end
-
   
   
   opts.on('-X','--exclude FILE_PATTERN',String,
           'Exclude files that match FILE_PATTERN (as ruby regexp). Case insensitive') do |p|
     options[:file_to_exclude].push(/#{Regexp.escape(p)}/i);
+  end
+
+  opts.on('-w','--wild','Do a wildcharacter search. * means "every char". Imply -i') do 
+    options[:be_wild] = true
+    options[:ignorecase]=true
   end
 
 
@@ -67,8 +72,7 @@ optparse= OptionParser.new do  |opts|
 
 
   opts.on( '-h', '--help', 'Display this screen' ) do
-    puts opts
-    puts "Options are grep-like"
+    puts opts   
     puts "EXAMPLES:"
     puts "czsearch ciao Koros"
     puts " Will search Koros OR ciao"
@@ -76,6 +80,8 @@ optparse= OptionParser.new do  |opts|
     puts " Will match also GNU and Gnu"   
     puts "czsearch  -X .orig -X .bak -X .java  html:select"
     puts " Will skip java and backup file"
+    puts "czsearch -w 'public*class School'"
+    puts " Will seach for a java class called School ignoring characters between public and class."
     exit
   end
 end
@@ -86,13 +92,23 @@ ARGV.each do | s |
   util=CodeZauker::Util.new()
   redisConnection=Redis.new(:host => options[:redis_host], :port => options[:redis_port], :password=> options[:redis_password])
   fs=CodeZauker::FileScanner.new(redisConnection)
-  if options[:ignorecase]==false
-    files=fs.search(s)
-    pattern=/#{Regexp.escape(s)}/
+
+  if options[:be_wild]==true
+    puts "Wild MODE"
+    cli=CodeZauker::CliUtil.new()
+    r=cli.doWildSearch(s,fs)
+    files=  r[:files]
+    pattern=r[:regexp]
   else
-    files=fs.isearch(s)
-    pattern=/#{Regexp.escape(s)}/i
+    if options[:ignorecase]==false
+      files=fs.search(s)
+      pattern=/#{Regexp.escape(s)}/
+    else
+      files=fs.isearch(s)
+      pattern=/#{Regexp.escape(s)}/i
+    end
   end
+
   files.each do |f|
     to_exclude=false
     if options[:file_to_exclude].length >0

@@ -67,8 +67,11 @@ and enjoy!
 
 
 * DB Version
-Starting from version 0.0.8, a new index check option on czindexer will be able to migrate database between release
-The index check will also "purge" deleted files and manage database versioning too
+Starting from version 0.0.8, a new index check option on czindexer
+ will be able to migrate database between release,
+
+
+
 * Release History
   | Version | Date        | Summary                                                                |
   |---------+-------------+------------------------------------------------------------------------|

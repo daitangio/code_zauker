@@ -1,7 +1,21 @@
 module CodeZauker
 
   class CliUtil
-    
+
+    def doWildSearch(term,fileScanner)
+      fileGroup=fileScanner.wsearch(term)
+      # Make a simple regexp from the wild stuff...
+      finalRegexp=""
+      term.split("*").each do |term|
+        finalRegexp= finalRegexp+Regexp.escape(term)+".*"
+      end
+      return {
+        :regexp=>finalRegexp,
+        :files => fileGroup
+      }
+      
+    end
+
     def parse_host_options(connection_string)
       #puts "Parsing... #{connection_string}"
       options={}
