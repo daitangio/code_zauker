@@ -6,7 +6,7 @@
 <title>
   Class: CodeZauker::FileScanner
   
-    &mdash; Code Zauker 0.0.5 Documentation
+    &mdash; Code Zauker 0.0.8 Documentation
   
 </title>
 
@@ -15,9 +15,11 @@
   <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
 
 <script type="text/javascript" charset="utf-8">
-  relpath = '..';
-  if (relpath != '') relpath += '/';
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../';
+  framesUrl = "../frames.html#!" + escape(window.location.href);
 </script>
+
 
   <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
 
@@ -26,36 +28,41 @@
 
   </head>
   <body>
-    <script type="text/javascript" charset="utf-8">
-      if (window.top.frames.main) document.body.className = 'frames';
-    </script>
-    
     <div id="header">
       <div id="menu">
   
-    <a href="../_index.html">Index (F)</a> &raquo; 
+    <a href="../_index.html">Index (F)</a> &raquo;
     <span class='title'><span class='object_link'><a href="../CodeZauker.html" title="CodeZauker (module)">CodeZauker</a></span></span>
      &raquo; 
     <span class="title">FileScanner</span>
   
-  
+
   <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
 </div>
 
       <div id="search">
   
-    <a id="class_list_link" href="#">Class List</a>
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+      Class List
+    </a>
   
-    <a id="method_list_link" href="#">Method List</a>
+    <a class="full_list_link" id="method_list_link"
+        href="../method_list.html">
+      Method List
+    </a>
   
-    <a id="file_list_link" href="#">File List</a>
+    <a class="full_list_link" id="file_list_link"
+        href="../file_list.html">
+      File List
+    </a>
   
 </div>
       <div class="clear"></div>
     </div>
-    
+
     <iframe id="search_frame"></iframe>
-    
+
     <div id="content"><h1>Class: CodeZauker::FileScanner
   
   
@@ -133,6 +140,7 @@ find file scontaining the trigram...</p>
   
   
   
+  
 
   
     <span class="summary_desc"><div class='inline'></div></span>
@@ -148,6 +156,7 @@ find file scontaining the trigram...</p>
 
     
   </span>
+  
   
     <span class="note title constructor">constructor</span>
   
@@ -179,6 +188,7 @@ find file scontaining the trigram...</p>
   
   
   
+  
 
   
     <span class="summary_desc"><div class='inline'>
@@ -198,6 +208,7 @@ find file scontaining the trigram...</p>
 
     
   </span>
+  
   
   
   
@@ -225,6 +236,7 @@ find file scontaining the trigram...</p>
   
   
   
+  
 
   
     <span class="summary_desc"><div class='inline'></div></span>
@@ -246,6 +258,7 @@ find file scontaining the trigram...</p>
   
   
   
+  
 
   
     <span class="summary_desc"><div class='inline'></div></span>
@@ -261,6 +274,7 @@ find file scontaining the trigram...</p>
 
     
   </span>
+  
   
   
   
@@ -290,6 +304,7 @@ find file scontaining the trigram...</p>
   
   
   
+  
 
   
     <span class="summary_desc"><div class='inline'>
@@ -313,6 +328,7 @@ find file scontaining the trigram...</p>
   
   
   
+  
 
   
     <span class="summary_desc"><div class='inline'>
@@ -325,6 +341,33 @@ padded into trigrams.</p>
 </li>
 
       
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#wsearch-instance_method" title="#wsearch (instance method)">- (Object) <strong>wsearch</strong>(term, case_sensitive = true) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<h1>wild cards search</h1>
+
+<p>You can search trigram in the form public*class*Apple will match java
+declaration of MyApple  but not YourAppManager.</p>
+</div></span>
+  
+</li>
+
+      
     </ul>
   
 
@@ -332,13 +375,15 @@ padded into trigrams.</p>
   <h2>Constructor Details</h2>
   
     <div class="method_details first">
-  <p class="signature first" id="initialize-instance_method">
+  <h3 class="signature first" id="initialize-instance_method">
   
     - (<tt><span class='object_link'><a href="" title="CodeZauker::FileScanner (class)">FileScanner</a></span></tt>) <strong>initialize</strong>(redisConnection = nil) 
   
 
   
-</p><div class="docstring">
+
+  
+</h3><div class="docstring">
   <div class="discussion">
     
 <p>A new instance of FileScanner</p>
@@ -355,16 +400,16 @@ padded into trigrams.</p>
       <pre class="lines">
 
 
-112
-113
-114
-115
-116
-117
-118</pre>
+153
+154
+155
+156
+157
+158
+159</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 153</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_redisConnection'>redisConnection</span><span class='op'>=</span><span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_redisConnection'>redisConnection</span><span class='op'>==</span><span class='kw'>nil</span>
@@ -383,30 +428,42 @@ padded into trigrams.</p>
 
   <div id="instance_method_details" class="method_details_list">
     <h2>Instance Method Details</h2>
-    
+
     
       <div class="method_details first">
-  <p class="signature first" id="disconnect-instance_method">
+  <h3 class="signature first" id="disconnect-instance_method">
   
     - (<tt>Object</tt>) <strong>disconnect</strong> 
   
 
   
-</p><table class="source_code">
+
+  
+</h3><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-121
-122
-123</pre>
+162
+163
+164
+165
+166
+167
+168
+169</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 121</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 162</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_disconnect'>disconnect</span><span class='lparen'>(</span><span class='rparen'>)</span>    
-  <span class='ivar'>@redis</span><span class='period'>.</span><span class='id identifier rubyid_quit'>quit</span>
+  <span class='kw'>begin</span>
+    <span class='ivar'>@redis</span><span class='period'>.</span><span class='id identifier rubyid_quit'>quit</span>
+  <span class='kw'>rescue</span> <span class='const'>Errno</span><span class='op'>::</span><span class='const'>EAGAIN</span> <span class='op'>=&gt;</span><span class='id identifier rubyid_e'>e</span>
+    <span class='comment'># Nothing to do...
+</span>    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ignored EAGAIN ERROR during disconnect...</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -414,13 +471,15 @@ padded into trigrams.</p>
 </div>
     
       <div class="method_details ">
-  <p class="signature " id="isearch-instance_method">
+  <h3 class="signature " id="isearch-instance_method">
   
     - (<tt>Object</tt>) <strong>isearch</strong>(term) 
   
 
   
-</p><div class="docstring">
+
+  
+</h3><div class="docstring">
   <div class="discussion">
     
 <h1>Do a case-insenitive search    </h1>
@@ -439,18 +498,18 @@ padded into trigrams.</p>
       <pre class="lines">
 
 
-282
-283
-284
-285
-286
-287
-288
-289
-290</pre>
+328
+329
+330
+331
+332
+333
+334
+335
+336</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 282</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 328</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_isearch'>isearch</span><span class='lparen'>(</span><span class='id identifier rubyid_term'>term</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_termLowercase'>termLowercase</span><span class='op'>=</span><span class='id identifier rubyid_term'>term</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='lparen'>(</span><span class='rparen'>)</span>
@@ -467,64 +526,20 @@ padded into trigrams.</p>
 </div>
     
       <div class="method_details ">
-  <p class="signature " id="load-instance_method">
+  <h3 class="signature " id="load-instance_method">
   
     - (<tt>Object</tt>) <strong>load</strong>(filename, noReload = false) 
   
 
   
-</p><table class="source_code">
+
+  
+</h3><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-184
-185
-186
-187
-188
-189
-190
-191
-192
-193
-194
-195
-196
-197
-198
-199
-200
-201
-202
-203
-204
-205
-206
-207
-208
-209
-210
-211
-212
-213
-214
-215
-216
-217
-218
-219
-220
-221
-222
-223
-224
-225
-226
-227
-228
-229
 230
 231
 232
@@ -543,10 +558,56 @@ padded into trigrams.</p>
 245
 246
 247
-248</pre>
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 184</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 230</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='comma'>,</span> <span class='id identifier rubyid_noReload'>noReload</span><span class='op'>=</span><span class='kw'>false</span><span class='rparen'>)</span>
   <span class='comment'># Define my redis id...      
@@ -619,31 +680,33 @@ padded into trigrams.</p>
 </div>
     
       <div class="method_details ">
-  <p class="signature " id="map_ids_to_files-instance_method">
+  <h3 class="signature " id="map_ids_to_files-instance_method">
   
     - (<tt>Object</tt>) <strong>map_ids_to_files</strong>(fileIds) 
   
 
   
-</p><table class="source_code">
+
+  
+</h3><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-264
-265
-266
-267
-268
-269
-270
-271
-272
-273</pre>
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 264</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 310</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_map_ids_to_files'>map_ids_to_files</span><span class='lparen'>(</span><span class='id identifier rubyid_fileIds'>fileIds</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_filenames'>filenames</span><span class='op'>=</span><span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -661,28 +724,30 @@ padded into trigrams.</p>
 </div>
     
       <div class="method_details ">
-  <p class="signature " id="reindex-instance_method">
+  <h3 class="signature " id="reindex-instance_method">
   
     - (<tt>Object</tt>) <strong>reindex</strong>(fileList) 
   
 
   
-</p><table class="source_code">
+
+  
+</h3><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-312
-313
-314
-315
-316
-317
-318</pre>
+389
+390
+391
+392
+393
+394
+395</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 312</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 389</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_reindex'>reindex</span><span class='lparen'>(</span><span class='id identifier rubyid_fileList'>fileList</span><span class='rparen'>)</span>
   <span class='comment'>#puts &quot;Reindexing... #{fileList.length} files...&quot;
@@ -697,13 +762,15 @@ padded into trigrams.</p>
 </div>
     
       <div class="method_details ">
-  <p class="signature " id="remove-instance_method">
+  <h3 class="signature " id="remove-instance_method">
   
     - (<tt>Object</tt>) <strong>remove</strong>(filePaths = nil) 
   
 
   
-</p><div class="docstring">
+
+  
+</h3><div class="docstring">
   <div class="discussion">
     
 <p>Remove the files from the index, updating trigrams</p>
@@ -720,45 +787,45 @@ padded into trigrams.</p>
       <pre class="lines">
 
 
-333
-334
-335
-336
-337
-338
-339
-340
-341
-342
-343
-344
-345
-346
-347
-348
-349
-350
-351
-352
-353
-354
-355
-356
-357
-358
-359
-360
-361
-362
-363
-364
-365
-366
-367
-368</pre>
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 333</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 410</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove'>remove</span><span class='lparen'>(</span><span class='id identifier rubyid_filePaths'>filePaths</span><span class='op'>=</span><span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_filePaths'>filePaths</span><span class='op'>==</span><span class='kw'>nil</span>
@@ -802,13 +869,15 @@ padded into trigrams.</p>
 </div>
     
       <div class="method_details ">
-  <p class="signature " id="removeAll-instance_method">
+  <h3 class="signature " id="removeAll-instance_method">
   
     - (<tt>Object</tt>) <strong>removeAll</strong> 
   
 
   
-</p><div class="docstring">
+
+  
+</h3><div class="docstring">
   <div class="discussion">
     
 <p>Remove all the keys</p>
@@ -825,19 +894,19 @@ padded into trigrams.</p>
       <pre class="lines">
 
 
-321
-322
-323
-324
-325
-326
-327
-328
-329
-330</pre>
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 321</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 398</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_removeAll'>removeAll</span><span class='lparen'>(</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_tokill'>tokill</span><span class='op'>=</span><span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -855,13 +924,15 @@ padded into trigrams.</p>
 </div>
     
       <div class="method_details ">
-  <p class="signature " id="search-instance_method">
+  <h3 class="signature " id="search-instance_method">
   
     - (<tt>Object</tt>) <strong>search</strong>(term) 
   
 
   
-</p><div class="docstring">
+
+  
+</h3><div class="docstring">
   <div class="discussion">
     
 <h1>search</h1>
@@ -881,24 +952,24 @@ padded into trigrams</p>
       <pre class="lines">
 
 
-296
-297
-298
-299
-300
-301
-302
-303
-304
-305
-306
-307
-308
-309
-310</pre>
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 296</span>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 373</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_search'>search</span><span class='lparen'>(</span><span class='id identifier rubyid_term'>term</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_term'>term</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&lt;</span> <span class='const'>GRAM_SIZE</span>
@@ -920,14 +991,102 @@ padded into trigrams</p>
 </table>
 </div>
     
+      <div class="method_details ">
+  <h3 class="signature " id="wsearch-instance_method">
+  
+    - (<tt>Object</tt>) <strong>wsearch</strong>(term, case_sensitive = true) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<h1>wild cards search</h1>
+
+<p>You can search trigram in the form public*class*Apple will match java
+declaration of MyApple  but not YourAppManager</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/code_zauker.rb', line 343</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_wsearch'>wsearch</span><span class='lparen'>(</span><span class='id identifier rubyid_term'>term</span><span class='comma'>,</span><span class='id identifier rubyid_case_sensitive'>case_sensitive</span><span class='op'>=</span><span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='comment'># Split stuff
+</span>  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Wild Search request:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_term'>term</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_m'>m</span><span class='op'>=</span><span class='id identifier rubyid_term'>term</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>*</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='op'>&gt;</span><span class='int'>0</span>
+    <span class='id identifier rubyid_trigramInAnd'>trigramInAnd</span><span class='op'>=</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>*= Found:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span> <span class='id identifier rubyid_wt'>wt</span> <span class='op'>|</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Splitting  </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_wt'>wt</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_trigSet'>trigSet</span><span class='op'>=</span><span class='id identifier rubyid_split_in_trigrams'>split_in_trigrams</span><span class='lparen'>(</span><span class='id identifier rubyid_wt'>wt</span><span class='comma'>,</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>trigram</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_trigramInAnd'>trigramInAnd</span><span class='op'>=</span><span class='id identifier rubyid_trigramInAnd'>trigramInAnd</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_trigSet'>trigSet</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Trigrams: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_trigramInAnd'>trigramInAnd</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_trigramInAnd'>trigramInAnd</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='op'>==</span><span class='int'>0</span>
+      <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='kw'>end</span>      
+    <span class='id identifier rubyid_fileIds'>fileIds</span><span class='op'>=</span>    <span class='ivar'>@redis</span><span class='period'>.</span><span class='id identifier rubyid_sinter'>sinter</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_trigramInAnd'>trigramInAnd</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_fileNames'>fileNames</span><span class='op'>=</span><span class='id identifier rubyid_map_ids_to_files'>map_ids_to_files</span><span class='lparen'>(</span><span class='id identifier rubyid_fileIds'>fileIds</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>DEBUG </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_fileIds'>fileIds</span><span class='rbrace'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_fileNames'>fileNames</span><span class='rbrace'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_fileNames'>fileNames</span>     
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Warn no Wild!</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_search'>search</span><span class='lparen'>(</span><span class='id identifier rubyid_term'>term</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
 </div>
-    
+
     <div id="footer">
-  Generated on Mon Apr  9 16:40:13 2012 by 
+  Generated on Wed May 16 14:43:39 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.7.5 (ruby-1.9.3).
+  0.8.1 (ruby-1.9.3).
 </div>
 
   </body>

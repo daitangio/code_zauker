@@ -4,7 +4,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>
-  Code Zauker 0.0.5 Documentation
+  Code Zauker 0.0.8 Documentation
   
 </title>
 
@@ -13,9 +13,11 @@
   <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
 
 <script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
   relpath = '';
-  if (relpath != '') relpath += '/';
+  framesUrl = "frames.html#!" + escape(window.location.href);
 </script>
+
 
   <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
 
@@ -24,35 +26,37 @@
 
   </head>
   <body>
-    <script type="text/javascript" charset="utf-8">
-      if (window.top.frames.main) document.body.className = 'frames';
-    </script>
-    
     <div id="header">
       <div id="menu">
   
-    
-    <span class="title"></span>
-  
-  
+
   <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
 </div>
 
       <div id="search">
   
-    <a id="class_list_link" href="#">Class List</a>
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
   
-    <a id="method_list_link" href="#">Method List</a>
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
   
-    <a id="file_list_link" href="#">File List</a>
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
   
 </div>
       <div class="clear"></div>
     </div>
-    
+
     <iframe id="search_frame"></iframe>
-    
-    <div id="content"><h1 class="noborder title">Code Zauker 0.0.5 Documentation</h1>
+
+    <div id="content"><h1 class="noborder title">Code Zauker 0.0.8 Documentation</h1>
 <div id="listing">
   <h1 class="alphaindex">Alphabetic Index</h1>
   
@@ -72,7 +76,14 @@
           <ul>
             
               <li>
-                <span class='object_link'><a href="CodeZauker.html" title="CodeZauker (module)">CodeZauker</a></span> 
+                <span class='object_link'><a href="CodeZauker/CliUtil.html" title="CodeZauker::CliUtil (class)">CliUtil</a></span>
+                
+                  <small>(CodeZauker)</small>
+                
+              </li>
+            
+              <li>
+                <span class='object_link'><a href="CodeZauker.html" title="CodeZauker (module)">CodeZauker</a></span>
                 
               </li>
             
@@ -85,7 +96,7 @@
           <ul>
             
               <li>
-                <span class='object_link'><a href="CodeZauker/FileScanner.html" title="CodeZauker::FileScanner (class)">FileScanner</a></span> 
+                <span class='object_link'><a href="CodeZauker/FileScanner.html" title="CodeZauker::FileScanner (class)">FileScanner</a></span>
                 
                   <small>(CodeZauker)</small>
                 
@@ -100,7 +111,22 @@
           <ul>
             
               <li>
-                <span class='object_link'><a href="Grep.html" title="Grep (module)">Grep</a></span> 
+                <span class='object_link'><a href="Grep.html" title="Grep (module)">Grep</a></span>
+                
+              </li>
+            
+          </ul>
+        </ul>
+      
+        
+        <ul id="alpha_I" class="alpha">
+          <li class="letter">I</li>
+          <ul>
+            
+              <li>
+                <span class='object_link'><a href="CodeZauker/IndexManager.html" title="CodeZauker::IndexManager (class)">IndexManager</a></span>
+                
+                  <small>(CodeZauker)</small>
                 
               </li>
             
@@ -113,7 +139,7 @@
           <ul>
             
               <li>
-                <span class='object_link'><a href="CodeZauker/Util.html" title="CodeZauker::Util (class)">Util</a></span> 
+                <span class='object_link'><a href="CodeZauker/Util.html" title="CodeZauker::Util (class)">Util</a></span>
                 
                   <small>(CodeZauker)</small>
                 
@@ -129,11 +155,11 @@
 </div>
 
 </div>
-    
+
     <div id="footer">
-  Generated on Mon Apr  9 16:40:13 2012 by 
+  Generated on Wed May 16 14:43:37 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.7.5 (ruby-1.9.3).
+  0.8.1 (ruby-1.9.3).
 </div>
 
   </body>
