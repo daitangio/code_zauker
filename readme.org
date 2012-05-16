@@ -66,30 +66,22 @@ Run
 and enjoy!
 
 
+* DB Version
+Starting from version 0.0.8, a new index check option on czindexer will be able to migrate database between release
+The index check will also "purge" deleted files and manage database versioning too
 * Release History
-  | Version | Date        | Summary                                                         |
-  |---------+-------------+-----------------------------------------------------------------|
-  |   0.0.8 |             | Wildcard (*) search                                             |
-  |   0.0.7 | 13 May 2012 | Better documentation, mczindexer, new report command            |
-  |   0.0.6 | 04 May 2012 | New redis-server option. Better web search with results hilight |
-  |   0.0.5 | 09 Apr 2012 | Added Sinatra-based web search page, featuring bootrstrap css   |
-  |   0.0.4 | 12 Feb 2012 | PDF Searching                                                   |
-  |   0.0.3 | 03 Feb 2012 | Added Case insensitive search.UTF-8 trigram database            |
-  |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.                  |
-  |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only)               |
-  |         |             |                                                                 |
-  |         |             |                                                                 |
-
-* Aws tests
-** Micro instance
-Without multiplexing you get
- real    4m39.599s
-for indexing code_zauker
-
-With
- time find . -type f -print0 | xargs -0 -P 10  -n 20  ./bin/czindexer -v --redis-server awsserver
-You get about
-  real    0m31.284s
+  | Version | Date        | Summary                                                                |
+  |---------+-------------+------------------------------------------------------------------------|
+  |   0.0.8 |             | Wildcard (*) search/better error handling of missed files/indexchecker |
+  |   0.0.7 | 13 May 2012 | Better documentation, mczindexer, new report command                   |
+  |   0.0.6 | 04 May 2012 | New redis-server option. Better web search with results hilight        |
+  |   0.0.5 | 09 Apr 2012 | Added Sinatra-based web search page, featuring bootrstrap css          |
+  |   0.0.4 | 12 Feb 2012 | PDF Searching                                                          |
+  |   0.0.3 | 03 Feb 2012 | Added Case insensitive search.UTF-8 trigram database                   |
+  |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.                         |
+  |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only)                      |
+  |         |             |                                                                        |
+  |         |             |                                                                        |
 
 
 * DEVELOPING

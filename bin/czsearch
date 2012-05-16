@@ -107,6 +107,13 @@ ARGV.each do | s |
         end
       end
     end
+    
+    # Does it exist?
+    if !to_exclude && !File.exists?(f)
+      #puts "WARN: Not FOUND #{f}"
+      to_exclude=true
+    end
+
     if !to_exclude
       begin
         if util.is_pdf?(f)==false

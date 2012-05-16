@@ -43,7 +43,11 @@ optparse= OptionParser.new do  |opts|
     exit
   end
 
-  #TODO ADD REMOVE ALL option
+  options[:check_index]=false
+  opts.on( '-c', '--check-index', 'Do a sanity check of the index before starting') do
+    options[:check_index]=true
+  end
+
 end
 
 
@@ -98,7 +102,14 @@ def processElement(l,fs,options)
   end  
 end
 
+################# MAIN STARTS HERE
 
+if options[:check_index]
+    fixConn=Redis.new(:host => options[:redis_host], :port => options[:redis_port], :password=> options[:redis_password])
+    im=CodeZauker::IndexManager.new(fixConn)
+    im.check_repair()   
+    exit
+end 
 
 begin  
   $CUMULATED_TIME=0

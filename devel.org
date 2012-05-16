@@ -16,3 +16,13 @@ Case Sensitive		case:yes
 ** Reference
    http://www.rubyinside.com/21-ruby-tricks-902.html
 
+
+* Aws tests
+** Micro instance
+Without multiplexing you get 4m39.599s
+for indexing code_zauker
+
+With
+ time find . -type f -print0 | xargs -0 -P 10  -n 20  ./bin/czindexer -v --redis-server awsserver
+You get about 0m31.284s
+

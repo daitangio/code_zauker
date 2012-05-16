@@ -5,6 +5,8 @@ require 'redis/connection/hiredis'
 require 'redis'
 require 'set'
 require 'pdf/reader'
+require 'date'
+
 # This module implements a simple reverse indexer 
 # based on Redis
 # The idea is ispired by http://swtch.com/~rsc/regexp/regexp4.html
@@ -102,8 +104,47 @@ module CodeZauker
       end
       return lines
     end
+  end
 
-
+  # Manage the index and keep it well organized
+  class IndexManager
+    def initialize(redisConnection=nil)
+      if redisConnection==nil
+        @redis=Redis.new
+      else
+        @redis=redisConnection
+      end
+    end    
+    
+    def check_repair
+      
+      puts "Staring index check"
+      dbversion=@redis.hget("codezauker","db_version")
+      if dbversion==nil
+        puts "DB Version <=0.7"
+        @redis.hset("codezauker","db_version",CodeZauker::DB_VERSION)
+        # no other checks to do right now
+      else
+        if dbversion.to_i() > CodeZauker::DB_VERSION
+          raise "DB Version #{dbversion} is greater than my #{CodeZauker::DB_VERSION}"
+        else
+          puts "Migrating from #{dbversion} to #{CodeZauker::DB_VERSION}"
+          # Nothing to do right now
+        end
+      end
+      puts "Summary....."
+      dbversion=@redis.hget("codezauker","db_version")
+      last_check=@redis.hget("codezauker","last_check")
+      puts "DB Version: #{dbversion}"
+      puts "Last Check: #{last_check}"
+      puts "Checking...."
+      @redis.hset("codezauker","last_check",DateTime.now().to_s())      
+      puts "Issuing save..."
+      @redis.save()
+      puts "Save successful"
+      @redis.quit()
+      puts "Disconnected from redis"
+    end
   end
 
   # Scan a file and push it inside redis...
