@@ -2,6 +2,7 @@ module CodeZauker
 
   class CliUtil
 
+    # Create a regexp to do a case insensitive wild search used by grep
     def doWildSearch(term,fileScanner)
       fileGroup=fileScanner.wsearch(term)
       # Make a simple regexp from the wild stuff...
@@ -10,7 +11,7 @@ module CodeZauker
         finalRegexp= finalRegexp+Regexp.escape(term)+".*"
       end
       return {
-        :regexp=>finalRegexp,
+        :regexp=>/#{finalRegexp}/i,
         :files => fileGroup
       }
       
