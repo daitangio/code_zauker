@@ -106,7 +106,7 @@ class FileScannerBasicSearch < Test::Unit::TestCase
     fs.load("./test/fixture/kurukku.txt", noReload=true)
     flist=fs.isearch("caSeinsenSitive Search TEST.")
     assert flist.include?("./test/fixture/kurukku.txt"), "Case insensitive search failed. #{flist}"
-    assert fs.search("caSeinsenSitive").length==0, "Case Sensitive Search failed"
+    assert fs.search("CASeinsenSitivE").include?("./test/fixture/kurukku.txt"), "Search must be always insensitive"
   end
 
   def test_case_insensitive3

@@ -1,4 +1,4 @@
 module CodeZauker
-  VERSION = "0.0.8"
+  VERSION = "0.0.9"
   DB_VERSION = 1
 end

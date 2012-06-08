@@ -100,11 +100,12 @@ ARGV.each do | s |
     files=  r[:files]
     pattern=r[:regexp]
   else
-    if options[:ignorecase]==false
-      files=fs.search(s)
+    # It uses always isearch
+    # and delegates to the grep subsystem to find it out
+    files=fs.isearch(s)
+    if options[:ignorecase]==false      
       pattern=/#{Regexp.escape(s)}/
     else
-      files=fs.isearch(s)
       pattern=/#{Regexp.escape(s)}/i
     end
   end

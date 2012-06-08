@@ -213,11 +213,9 @@ module CodeZauker
       # changing multi into pipielined
       @redis.pipelined do 
         s.each do | trigram |        
-          @redis.sadd "trigram:#{trigram}",fid
-          @redis.sadd "fscan:trigramsOnFile:#{fid}", trigram
-          # Add the case-insensitive-trigram
           begin
             @redis.sadd "trigram:ci:#{trigram.downcase}",fid
+            @redis.sadd "fscan:trigramsOnFile:#{fid}", trigram
           rescue ArgumentError 
             error=true          
           end
@@ -327,6 +325,9 @@ module CodeZauker
     # "trigram:ci:*"
     # all downcase
     def isearch(term)
+      if term.length < GRAM_SIZE
+        raise "FATAL: #{term} is shorter then the minimum size of #{GRAM_SIZE} character"
+      end      
       termLowercase=term.downcase()
       trigramInAnd=split_in_trigrams(termLowercase,"trigram:ci")
       if trigramInAnd.length==0
@@ -375,20 +376,10 @@ module CodeZauker
     # = search
     # Find a list of file candidates to a search string
     # The search string is padded into trigrams    
+    # Starting from 0.0.9 is case insensitive and
+    # equal to isearch
     def search(term)
-      if term.length < GRAM_SIZE
-        raise "FATAL: #{term} is shorter then the minimum size of #{GRAM_SIZE} character"
-      end
-      #puts " ** Searching: #{term}"
-      trigramInAnd=split_in_trigrams(term,"trigram")
-      #puts "Trigam conversion /#{term}/ into #{trigramInAnd}"
-      if trigramInAnd.length==0
-        return []
-      end      
-      fileIds=    @redis.sinter(*trigramInAnd)
-      fileNames=map_ids_to_files(fileIds)
-      #puts "DEBUG #{fileIds} #{fileNames}"
-      return fileNames
+      return self.isearch(term)
     end
 
     def reindex(fileList)
@@ -431,8 +422,7 @@ module CodeZauker
           puts "?Nothing to do on #{filename}"
         end
         puts "#{filename} id=#{fid} Trigrams: #{trigramsToExpurge.length} Expurging..."        
-        trigramsToExpurge.each do | ts |
-          @redis.srem "trigram:#{ts}", fid
+        trigramsToExpurge.each do | ts |          
           begin
             @redis.srem "trigram:ci:#{ts.downcase}",fid
             #putc "."
