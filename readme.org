@@ -4,6 +4,14 @@ Code Zauker is based from ideas taken by old Google Code Search and uses Redis a
 
 For news and discussion: http://gioorgi.com/tag/code-zauker/
 
+* NEWS 
+* 12/2012
+  Version 0.1.0 spot a new command, /czlist/ which simplify integration with unix tool-chain.
+  czlist access directly to code zauker core to show only the filename 
+  which could contains the searchstring.
+  czlist is ideal for IDE integration
+  
+
 
 * INSTALL
 To install Code Zauker,simply issue
@@ -79,6 +87,7 @@ to give you a fast-startup
 * Release History
   | Version | Date        | Summary                                                                       |
   |---------+-------------+-------------------------------------------------------------------------------|
+  |   0.1.0 |             | Added czlist command which supersedes czsearch                                |
   |   0.0.9 | 12 Oct 2012 | Removed case sensitive backend to improve space use. Er Zauker Compatibility. |
   |         |             | Tested on MSWin                                                               |
   |   0.0.8 | 04 Jun 2012 | Wildcard (*) search/better error handling of missed files/indexchecker        |

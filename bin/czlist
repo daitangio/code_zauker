@@ -1,0 +1,122 @@
+#!/usr/bin/env ruby 
+#== czlist list only the files which can contain the required string
+# should be combined with "xargs grep/egrep"
+# Ideal for ide integration
+# Simpler then czsearch
+$VERBOSE=nil 
+require 'code_zauker'
+require 'code_zauker/cli'
+require 'redis/connection/hiredis'
+require 'redis'
+#include Grep
+
+require 'optparse'
+options={}
+optparse= OptionParser.new do  |opts|
+  opts.banner="Usage: czlist [options] [term1] [term2]..."
+  options[:extensions_to_ignore]=[]
+  options[:file_to_exclude]=[]
+  options[:redis_host]="127.0.0.1"
+  options[:redis_port]=6379
+  options[:redis_password]=nil
+  options[:be_wild]=true
+
+  
+  
+  opts.on('-X','--exclude FILE_PATTERN',String,
+          'Exclude files that match FILE_PATTERN (as ruby regexp). Case insensitive') do |p|
+    options[:file_to_exclude].push(/#{Regexp.escape(p)}/i);
+  end
+
+  opts.on('-w','--wild','Do a wildcharacter search. * means "every char". True by default') do 
+    options[:be_wild] = true
+    options[:ignorecase]=true
+  end
+
+  opts.on('-e','--exact','Disable wild search Userful if you need to search * or exact matches ') do 
+    options[:be_wild] = false
+    options[:ignorecase]=true
+  end
+
+
+  opts.on('--redis-server pass@SERVER:port', String,
+          'Specify the alternate redis server to use')do |server|
+    myoptions=CodeZauker::CliUtil.new().parse_host_options(server)
+    options[:redis_host]=myoptions[:redis_host]
+    options[:redis_port]=myoptions[:redis_port]
+    options[:redis_password]=myoptions[:redis_password]
+    
+    if options[:redis_password]
+      #puts "Server: #{options[:redis_host]} Port:#{options[:redis_port]} WithPassword"
+    else
+      #puts "Server: #{options[:redis_host]} Port:#{options[:redis_port]}"
+    end
+  end
+
+
+
+  opts.on( '-h', '--help', 'Display this screen' ) do
+    puts opts   
+    puts "EXAMPLES:"
+    puts "czlist for"
+    puts " Will search for loops and return the file smatching it"
+    puts "czlist -w 'public*class School'"
+    puts " Will seach for a java class called School ignoring characters between public and class."
+    puts "czlist for | xargs grep for"
+    puts " will be quite the same of czsearch but faster."
+    puts "Search is always case insensitive and wild by default"
+    exit
+  end
+end
+optparse.parse!
+
+ARGV.each do | s |
+  #puts "Code Zauker Searching for #{s}"  
+  util=CodeZauker::Util.new()
+  redisConnection=Redis.new(:host => options[:redis_host], :port => options[:redis_port], :password=> options[:redis_password])
+  fs=CodeZauker::FileScanner.new(redisConnection)
+
+  if options[:be_wild]==true    
+    cli=CodeZauker::CliUtil.new()
+    r=cli.doWildSearch(s,fs)
+    files=  r[:files]
+    pattern=r[:regexp]
+  else
+    # It uses always isearch
+    # and delegates to the grep subsystem to find it out
+    files=fs.isearch(s)
+  end
+
+  files.each do |f|
+    to_exclude=false
+    if options[:file_to_exclude].length >0
+      # Will match?
+      to_exclude=false
+      options[:file_to_exclude].each do |pattern|
+        #puts "\n\t#{f} =~  #{pattern}"
+        if (f  =~ pattern )
+          to_exclude=true
+          #puts "Excluded #{f}"
+          break
+        end
+      end
+    end
+    
+    # Does it exist?
+    if !to_exclude && !File.exists?(f)
+      #puts "WARN: Not FOUND #{f}"
+      to_exclude=true
+    end
+
+    if !to_exclude
+      begin
+        puts "#{f}"
+      rescue ArgumentError => ioe
+        puts "FATAL ArgumentError on #{f}"
+        raise ioe
+      end
+    else
+      
+    end
+  end
+end

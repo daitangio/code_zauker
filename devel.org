@@ -1,3 +1,32 @@
+* Basic  commands
+Make sure to uninstall code zauker from your gems (gem  uninstall code_zauker)
+before start developing
+** To Run tests
+#+begin_src sh
+rake test
+#+end_src
+
+** To release a new version to rubygem
+#+begin_src sh
+rake release
+#+end_src
+
+** Dependency management
+Done with ruby "bundle", you should check periodically dependency
+with "bundle update" to be sure to be with latest bug fixes of dependence libs
+
+* Notable facts
+** DB Size tradeoff
+If trigram size is greather then 3, the database become larger, because of less collisions.
+czlist work better with 4-grams then with 3-grams (a lot less false positive)
+but the size can be 50% bigger
+
+2-gram size rocks a lot, because of a very small db but false positive are a nightmare.
+czlist give 2188 files with a "for", but grep report only 383 of them (less then 18% of success)
+
+
+
+
 * Future/Study
 To fulfill Google code options:
 ** Google code input
