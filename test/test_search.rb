@@ -23,7 +23,7 @@ class FileScannerBasicSearch < Test::Unit::TestCase
 
   def test_scanner_trigram_simple    
     fs=CodeZauker::FileScanner.new()
-    fs.load("./readme.org",noReload=true)
+    fs.load("./readme.org")
     fs.load("./test/fixture/kurukku.txt")
     files=fs.search("kku")
     assert (files[0].include?("fixture/kurukku.txt")==true)
@@ -66,14 +66,14 @@ class FileScannerBasicSearch < Test::Unit::TestCase
 
   def test_very_big_file
     fs=CodeZauker::FileScanner.new()
-    fs.load("./test/fixture/TEST_LICENSE.txt",noReload=true)
+    fs.load("./test/fixture/TEST_LICENSE.txt")
     files=fs.search('"Commercial Use"')
     assert files.include?("./test/fixture/TEST_LICENSE.txt")==true
   end
 
   def test_remove
     fs=CodeZauker::FileScanner.new()
-    fs.load("./test/fixture/kurukku.txt", noReload=true)  
+    fs.load("./test/fixture/kurukku.txt")  
     fs.remove(["./test/fixture/kurukku.txt"])
     files=fs.search("\"Be hungry, be foolish\"")    
     assert files.length ==0, 
@@ -86,7 +86,7 @@ class FileScannerBasicSearch < Test::Unit::TestCase
   #   require 'redis'
   #   redis=Redis.new
   #   fs=CodeZauker::FileScanner.new(redis)
-  #   fs.load("./test/fixture/kurukku.txt", noReload=true) 
+  #   fs.load("./test/fixture/kurukku.txt") 
   #   fs.removeAll()
   #   foundKeys=redis.keys "*"
   #   #puts "Keys at empty db:#{foundKeys}"
@@ -96,14 +96,14 @@ class FileScannerBasicSearch < Test::Unit::TestCase
   # # 2012 Jan 30 New Case Insensitive Test cases
   def test_case_insensitive1
     fs=CodeZauker::FileScanner.new()
-    fs.load("./test/fixture/kurukku.txt", noReload=true)
+    fs.load("./test/fixture/kurukku.txt")
     flist=fs.isearch("caseinsensitive Search TEST.")
     assert flist.include?("./test/fixture/kurukku.txt"), "Case insensitive search failed. #{flist}"
   end
 
   def test_case_insensitive2
     fs=CodeZauker::FileScanner.new()
-    fs.load("./test/fixture/kurukku.txt", noReload=true)
+    fs.load("./test/fixture/kurukku.txt")
     flist=fs.isearch("caSeinsenSitive Search TEST.")
     assert flist.include?("./test/fixture/kurukku.txt"), "Case insensitive search failed. #{flist}"
     assert fs.search("CASeinsenSitivE").include?("./test/fixture/kurukku.txt"), "Search must be always insensitive"
@@ -111,7 +111,7 @@ class FileScannerBasicSearch < Test::Unit::TestCase
 
   def test_case_insensitive3
     fs=CodeZauker::FileScanner.new()
-    fs.load("./test/fixture/kurukku.txt", noReload=true)
+    fs.load("./test/fixture/kurukku.txt")
     u=CodeZauker::Util.new()
     (u.mixCase("CaSeinsen")).each { |t|
       #puts "Checking #{t}"

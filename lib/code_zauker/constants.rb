@@ -40,8 +40,8 @@ module CodeZauker
                               ".mp3",".mp4",".wav",
                               # Image exclusion
                               ".png",".gif",".jpg",".bmp",
-                              # Temp stuff
-                              ".tmp","~",
+                              # Temp stuff and logs
+                              ".tmp","~",".log",".bar",
                               # Oracle exports...
                               ".exp"
                               ]

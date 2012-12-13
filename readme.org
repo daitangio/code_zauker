@@ -5,8 +5,18 @@ Code Zauker is based from ideas taken by old Google Code Search and uses Redis a
 For news and discussion: http://gioorgi.com/tag/code-zauker/
 
 * NEWS 
-* 12/2012
-  Version 0.1.0 spot a new command, /czlist/ which simplify integration with unix tool-chain.
+** 12/2012
+  Version 0.1.0 spot an auto-reindexing system.
+  CodeZauker will store a MD5 checksum for every file and reindex automatically changed files.
+  There is a small API change: FileScanner>>load will no longer accept noReload because it will automatically use md5 to undestand if a reindex is needed.
+  Anyway, client code should relay on FileScanner>>reindex to force a reindex of a file.
+  This feature is still beta but works pretty well.
+  When a lot of reindexing is involved, performance can drop hard under 2 files per sec
+
+  
+
+
+  Version 0.1.0 spot also a new command, /czlist/ which simplify integration with unix tool-chain.
   czlist access directly to code zauker core to show only the filename 
   which could contains the searchstring.
   czlist is ideal for IDE integration
@@ -87,7 +97,7 @@ to give you a fast-startup
 * Release History
   | Version | Date        | Summary                                                                       |
   |---------+-------------+-------------------------------------------------------------------------------|
-  |   0.1.0 |             | Added czlist command which supersedes czsearch                                |
+  |   0.1.0 |             | Added czlist command which supersedes czsearch and auto redindexing           |
   |   0.0.9 | 12 Oct 2012 | Removed case sensitive backend to improve space use. Er Zauker Compatibility. |
   |         |             | Tested on MSWin                                                               |
   |   0.0.8 | 04 Jun 2012 | Wildcard (*) search/better error handling of missed files/indexchecker        |

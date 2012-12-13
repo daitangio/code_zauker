@@ -86,7 +86,7 @@ def processElement(l,fs,options)
       if   options[:reindex] == true          
         fs.reindex([l])
       else
-        fs.load(l,noReload=true)
+        fs.load(l)
       end
       timeTaken=Time.now-startTime
       $PROCESSED_FILES+=1

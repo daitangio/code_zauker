@@ -2,3 +2,9 @@
 * Bug 001 :wontfix_soon:
   Indexing a 700Kb gem take too much time, it seems looping
   Avoid indexing gem file for the meantime.
+* Bug 002 :limitation:
+  Reindexing does not work very well. Code Zauker will not automatically detect a file has changed.
+  Implement a md5 checksum support for reindexing changed files fast
+
+* Bug 003 :low:
+  Avoid keys() command because it is deprecated for normal usage scenario

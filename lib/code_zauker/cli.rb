@@ -79,8 +79,8 @@ module CodeZauker
         min=trigramsOnFile if trigramsOnFile <min and trigramsOnFile>0        
       end
       av=sum/count
-      puts "Average Trigrams per file:#{av} Min: #{min} Max: #{max}"
-      tagCharSize=max/80
+      puts "Average -grams per file:#{av} Min: #{min} Max: #{max}"
+      tagCharSize=max/20
       #tagCharSize=max/10 if tagCharSize>80
       puts "Graphic summary... +=#{tagCharSize}"
       ids.each do | fid |
@@ -88,7 +88,7 @@ module CodeZauker
         if trigramsOnFile>= (tagCharSize*3)
           fname=redis.get("fscan:id2filename:#{fid}")
           bar="+"*(trigramsOnFile/tagCharSize)
-          puts "#{bar} #{fname}"
+          puts "#{trigramsOnFile} #{bar} #{fname}"
         end
       end
 

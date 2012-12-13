@@ -8,11 +8,14 @@ require 'set'
 require 'pdf/reader'
 require 'date'
 
+#require 'digest'
+require 'digest/md5'
+
 # This module implements a simple reverse indexer 
 # based on Redis
 # The idea is ispired by http://swtch.com/~rsc/regexp/regexp4.html
 module CodeZauker
-  GRAM_SIZE=3
+  GRAM_SIZE=4
   SPACE_GUY=" "*GRAM_SIZE
 
   # = Basic utility class
@@ -199,9 +202,9 @@ module CodeZauker
           end
         end
       end
-      if showlog
-        puts " <Pushed #{s.length}..."
-      end      
+      # if showlog
+      #   puts " <Pushed #{s.length}..."
+      # end      
       puts "WARN: Some invalid UTF-8  char on #{filename} Case insensitive search will be compromised" if case_insensitive_trigram_failed      
     end
 
@@ -226,7 +229,7 @@ module CodeZauker
     private :pushTrigramsSetRecoverable
 
 
-    def load(filename, noReload=false)
+    def load(filename)
       # Define my redis id...      
       # Already exists?...
       fid=@redis.get "fscan:id:#{filename}"
@@ -237,10 +240,18 @@ module CodeZauker
         @redis.set "fscan:id:#{filename}", fid
         @redis.set "fscan:id2filename:#{fid}",filename
       else
-        if noReload 
-          #puts "Already found #{filename} as id:#{fid} and NOT RELOADED"
+        # ADD MD5 Checksum
+        #Digest::MD5.hexdigest("aaa")
+        fileDigest = Digest::MD5.hexdigest(File.read(filename))
+        storedDigest=@redis.get("cz:md5:#{filename}")
+        if(fileDigest!=storedDigest)
+          puts "#{filename} CHANGED...MD5: #{fileDigest} REINDEXING..."
+          self.remove([filename]) 
+        else          
+          ## puts "#{filename} id:#{fid} MD% UP TO DATE and NOT RELOADED"
           return nil
         end
+
       end      
       # fid is the set key!...
       trigramScanned=0
@@ -256,7 +267,7 @@ module CodeZauker
 
       lines.each do  |lineNotUTF8|
         l= util.ensureUTF8(lineNotUTF8)
-        # Split each line into 3-char chunks, and store in a redis set
+        # Split each line into GRAM_SIZE-char chunks, and store in a redis set
         i=0
         for istart in 0...(l.length-GRAM_SIZE) 
           trigram = l[istart, GRAM_SIZE]
@@ -271,7 +282,7 @@ module CodeZauker
             s=Set.new()             
           end
           trigramScanned += 1
-          #puts "#{istart} Trigram fscan:#{trigram}/  FileId: #{fid}"
+          #puts "#{istart} Gram fscan:#{trigram}/  FileId: #{fid}"
         end
       end
       
@@ -287,8 +298,13 @@ module CodeZauker
       @redis.sadd "fscan:processedFiles", "#{filename}"
       trigramRatio=( (trigramsOnFile*1.0) / trigramScanned )* 100.0
       if trigramRatio < 10 or trigramRatio >75        
-        puts "#{filename}\n\tRatio:#{trigramRatio.round}%  Unique Trigrams:#{trigramsOnFile} Total Scanned: #{trigramScanned} ?Binary" if trigramRatio >90 and trigramsOnFile>70
+        puts "#{filename}\n\tRatio:#{trigramRatio.round}%  Unique #{GRAM_SIZE}-grams:#{trigramsOnFile} Total Scanned: #{trigramScanned} ?Binary" if trigramRatio >90 and trigramsOnFile>70
       end
+
+      # Register digest...do at last for better security
+      fileDigest = Digest::MD5.hexdigest(File.read(filename))
+      @redis.set("cz:md5:#{filename}",fileDigest)
+
       return nil
     end
 
@@ -344,11 +360,11 @@ module CodeZauker
     # YourAppManager
     def wsearch(term)
       # Split stuff
-      puts "Wild Search request:#{term}"
+      #puts "Wild Search request:#{term}"
       m=term.split("*")
       if m.length>0
         trigramInAnd=Set.new()
-        puts "*= Found:#{m.length}"
+        #puts "*= Found:#{m.length}"
         m.each do | wtc |
           wt=wtc.downcase()
           #puts "Splitting  #{wt}"
@@ -386,7 +402,7 @@ module CodeZauker
       #puts "Reindexing... #{fileList.length} files..."
       fileList.each do |current_file |
         self.remove([current_file])        
-        self.load(current_file,noReload=false)
+        self.load(current_file)
       end
     end
 
