@@ -2,7 +2,7 @@
 require "code_zauker/version"
 require "code_zauker/constants"
 require 'code_zauker/grep'
-require 'redis/connection/hiredis'
+# require 'redis/connection/hiredis'
 require 'redis'
 require 'set'
 require 'pdf/reader'

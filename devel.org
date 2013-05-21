@@ -1,6 +1,26 @@
 * Basic  commands
-Make sure to uninstall code zauker from your gems (gem  uninstall code_zauker)
+  Make sure to uninstall code zauker from your gems (gem  uninstall code_zauker)
 before start developing
+** Environment setup (windows)
+
+Ensure you have Dev kit too 
+http://rubyinstaller.org/downloads
+https://github.com/oneclick/rubyinstaller/wiki/Development-Kit
+It is for hiredis: hiredis is not mandatory, but suggested
+
+
+#+begin_src sh
+gem install bundler
+# Dev kit installation...
+#ruby /c/rubyinstallkit/dk.rb init
+#ruby /c/rubyinstallkit/dk.rb install
+bundle install
+rake test
+# Ensure dev code is reachable
+export RUBYLIB=k:/code/code_zauker/lib
+#+end_src
+
+
 ** To Run tests
 #+begin_src sh
 rake test

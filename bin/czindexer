@@ -3,7 +3,7 @@
 # find test/fixture/ -type f | xargs -P 5  -n 10 ./bin/czindexer
 # will fire 5 czindexer each with 10 files to process...
 require 'code_zauker/cli'
-require 'redis/connection/hiredis'
+#require 'redis/connection/hiredis'
 require 'redis'
 require 'optparse'
 options={}

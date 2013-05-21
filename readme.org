@@ -98,6 +98,7 @@ to give you a fast-startup
   |---------+-------------+-------------------------------------------------------------------------------|
   |   0.1.0 |             | Added czlist command which supersedes czsearch.                               |
   |         |             | Czindex now spot a better auto redindexing feature                            |
+  |         |             | Removed hiredis dependency for easier installation under ms-windows           |
   |   0.0.9 | 12 Oct 2012 | Removed case sensitive backend to improve space use. Er Zauker Compatibility. |
   |         |             | Tested on MSWin                                                               |
   |   0.0.8 | 04 Jun 2012 | Wildcard (*) search/better error handling of missed files/indexchecker        |

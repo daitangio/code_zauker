@@ -6,7 +6,7 @@
 $VERBOSE=nil 
 require 'code_zauker'
 require 'code_zauker/cli'
-require 'redis/connection/hiredis'
+#require 'redis/connection/hiredis'
 require 'redis'
 #include Grep
 

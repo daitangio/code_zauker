@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "yard", "~>0.7"
   s.add_development_dependency "rubyzip", "~> 0.9"
 
-  s.add_runtime_dependency "hiredis", "~> 0.3"
+  ## s.add_runtime_dependency "hiredis", "~> 0.3"
   s.add_runtime_dependency "redis", "~> 2.2"
   s.add_runtime_dependency "pdf-reader", "~> 1.0.0"
   s.add_runtime_dependency "sinatra", "~> 1.3"
