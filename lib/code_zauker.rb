@@ -15,7 +15,7 @@ require 'digest/md5'
 # based on Redis
 # The idea is ispired by http://swtch.com/~rsc/regexp/regexp4.html
 module CodeZauker
-  GRAM_SIZE=4
+  GRAM_SIZE=3
   SPACE_GUY=" "*GRAM_SIZE
 
   # = Basic utility class

@@ -5,16 +5,15 @@ Code Zauker is based from ideas taken by old Google Code Search and uses Redis a
 For news and discussion: http://gioorgi.com/tag/code-zauker/
 
 * NEWS 
-** 12/2012
-  Version 0.1.0 spot an auto-reindexing system.
+** And an happy coding year! 2013
+  Version 0.1.0 spot an auto-reindexing system, 3-gram size and a new command, czlist.
   CodeZauker will store a MD5 checksum for every file and reindex automatically changed files.
-  There is a small API change: FileScanner>>load will no longer accept noReload because it will automatically use md5 to undestand if a reindex is needed.
+  There is a small API change: FileScanner>>load will no longer accept noReload because it will 
+  automatically use md5 to undestand if a reindex is needed.
   Anyway, client code should relay on FileScanner>>reindex to force a reindex of a file.
   This feature is still beta but works pretty well.
+
   When a lot of reindexing is involved, performance can drop hard under 2 files per sec
-
-  
-
 
   Version 0.1.0 spot also a new command, /czlist/ which simplify integration with unix tool-chain.
   czlist access directly to code zauker core to show only the filename 
@@ -88,7 +87,7 @@ and enjoy!
 * MS-Windows Compatibility
 Grab your windows redis server at
 https://github.com/dmajkic/redis/downloads
-Version 0.0.9 has been succesful tested with Redis 2.4.5 32bit version
+Version 0.0.9 and 0.1.0 has been successful tested with Redis 2.4.5 32bit version
 You will find a 
 redis-win.conf example
 to give you a fast-startup
@@ -97,7 +96,8 @@ to give you a fast-startup
 * Release History
   | Version | Date        | Summary                                                                       |
   |---------+-------------+-------------------------------------------------------------------------------|
-  |   0.1.0 |             | Added czlist command which supersedes czsearch and auto redindexing           |
+  |   0.1.0 |             | Added czlist command which supersedes czsearch.                               |
+  |         |             | Czindex now spot a better auto redindexing feature                            |
   |   0.0.9 | 12 Oct 2012 | Removed case sensitive backend to improve space use. Er Zauker Compatibility. |
   |         |             | Tested on MSWin                                                               |
   |   0.0.8 | 04 Jun 2012 | Wildcard (*) search/better error handling of missed files/indexchecker        |
@@ -109,9 +109,11 @@ to give you a fast-startup
   |   0.0.2 | 29 Jan 2012 | Removed dependency on unix find for czindexer.                                |
   |   0.0.1 | 26 Jan 2012 | First RubyGems Release (for testing purpose only)                             |
 
-
-
+  
 * DEVELOPING
 For developing with Code Zauker you need bundler 1.0.21 or above
-See devel.org file
+See devel.org file for more information
+
+* KNOWN BUGS / LIMITATIONS
+At the time of writing, indexing emacs-lisp file is a very slow task.
 
