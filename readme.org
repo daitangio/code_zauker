@@ -1,3 +1,11 @@
+* Take a look to Er Zauker, the Evolution of this Project
+Code Zauker Project is currently superseded by Er Zauker, https://github.com/daitangio/er_zauker
+Er Zauker is a new implementation of Code Zauker ideas, and it is based on Erlang
+and Redis.
+
+This repository is left here for historical reasons.
+For future Code Zauker improvements/evolutions take a look to https://github.com/daitangio/er_zauker
+
 * Code Zauker: your code, indexed
 Code Zauker is a search engine for programming languages.
 Code Zauker is based from ideas taken by old Google Code Search and uses Redis as storage engine.
