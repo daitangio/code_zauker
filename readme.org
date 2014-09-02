@@ -1,5 +1,7 @@
 * Take a look to Er Zauker, the Evolution of this Project
-Code Zauker Project is currently superseded by Er Zauker, https://github.com/daitangio/er_zauker
+Code Zauker Project is currently superseded by Er Zauker, https://github.com/daitangio/er_zauker.
+
+
 Er Zauker is a new implementation of Code Zauker ideas, and it is based on Erlang
 and Redis.
 
